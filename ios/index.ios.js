@@ -5,6 +5,7 @@
  */
 
 import React, { Component } from 'react';
+import { access_token, device_id } from './token';
 import {
   AppRegistry,
   StyleSheet,
@@ -49,5 +50,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+function completeHabit(habit) {
+  fetch(`https://api.particle.io/v1/devices/${device_id}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${access_token}`})
+}
 
 AppRegistry.registerComponent('ios', () => ios);
