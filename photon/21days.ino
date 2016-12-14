@@ -12,6 +12,8 @@
 Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &Serial1);
 Adafruit_NeoPixel matrix = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
+int remoteCompleteHabit(String habit);
+
 typedef struct {
   uint16_t r;
   uint16_t g;
@@ -78,29 +80,35 @@ namespace state {
   return newColor;
 }*/
 
+void completeHabit(state::HabitState &state, Habit &config) {
+  Particle.publish("Habit Done!", String(config.sideLED));
+  state.done = true;
+  state.doneTime = Time.now();
+  //Color color = brightness(config.color, 50);
+  Color color = config.color;
+  uint16_t b = 50;
+  //turnOn(sweets.sideLED, 4, strip.Color(sweets.color.r, sweets.color.g, sweets.color.b));
+  //strip.setPixelColor(config.sideLED, strip.Color((color.r * b) >> 8, (color.g * b) >> 8, (color.b * b) >> 8));
+  int rgb = strip.Color(color.r, color.g, color.b);
+  strip.setPixelColor(config.sideLED, rgb);
+  matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
+  strip.setBrightness(50);
+  strip.show();
+  matrix.show();
+
+  // 30% chance a sound clip will play.
+  if(random(100) < 30) {
+    digitalWrite(D6, LOW);
+    delay(200);
+    digitalWrite(D6, HIGH);
+  }
+}
+
+
+
 void checkDone(state::HabitState &state, Habit &config) {
   if(!state.done && config.button.getSingleDebouncedPress()) {
-    Particle.publish("Habit Done!", String(config.sideLED));
-    state.done = true;
-    state.doneTime = Time.now();
-    //Color color = brightness(config.color, 50);
-    Color color = config.color;
-    uint16_t b = 50;
-    //turnOn(sweets.sideLED, 4, strip.Color(sweets.color.r, sweets.color.g, sweets.color.b));
-    //strip.setPixelColor(config.sideLED, strip.Color((color.r * b) >> 8, (color.g * b) >> 8, (color.b * b) >> 8));
-    int rgb = strip.Color(color.r, color.g, color.b);
-    strip.setPixelColor(config.sideLED, rgb);
-    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
-    strip.setBrightness(50);
-    strip.show();
-    matrix.show();
-
-    // 30% chance a sound clip will play.
-    if(random(100) < 30) {
-      digitalWrite(D6, LOW);
-      delay(200);
-      digitalWrite(D6, HIGH);
-    }
+    completeHabit(state, config);
   }
 }
 
@@ -161,8 +169,23 @@ void setup() {
     matrix.begin();
     matrix.setBrightness(15);
     matrix.show(); // Initialize all pixels to 'off'
-
+    Particle.function("habit", remoteCompleteHabit);
     Particle.publish("DSTTYFSWTYF", "Do something today that your future self will thank you for!");
+}
+
+int remoteCompleteHabit(String habit) {
+  if(habit == "sweets") {
+    completeHabit(state::sweets, sweets);
+    return 1;
+  } else if (habit == "murder") {
+    completeHabit(state::murder, murder);
+    return 1;
+  } else if ( habit == "brush") {
+    completeHabit(state::brush, brush);
+    return 1;
+  } else {
+    return -1;
+  }
 }
 
 void rainbow(uint8_t wait) {
@@ -214,9 +237,9 @@ void loop() {
   checkDone(state::sweets, sweets);
   checkDone(state::murder, murder);
   checkDone(state::brush, brush);
-  checkLightsOn(state::sweets, sweets);
+  /*checkLightsOn(state::sweets, sweets);
   checkLightsOn(state::murder, murder);
-  checkLightsOn(state::brush, brush);
+  checkLightsOn(state::brush, brush);*/
   endOfDay(state::sweets, sweets);
   endOfDay(state::murder, murder);
   endOfDay(state::brush, brush);

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { access_token, device_id } from './token';
 import {
   AppRegistry,
   StyleSheet,
@@ -28,3 +29,7 @@ export default class AwesomeProject extends Component {
 }
 
 AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
+
+function completeHabit(habit) {
+  fetch(`https://api.particle.io/v1/devices/${device_id}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${access_token}`})
+}
