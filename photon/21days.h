@@ -19,8 +19,14 @@ typedef struct {
 
 namespace lights {
   int map(int row, int column);
+  void show();
+  void sideOff(Habit &config);
+  void todayOff(Habit &config);
   void off(Habit &config);
+  void sideOn(Habit &config);
+  void todayOn(Habit &config);
   void on(Habit &config);
+
   void border();
 }
 

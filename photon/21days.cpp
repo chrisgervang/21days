@@ -53,6 +53,8 @@ namespace state {
   bool lightsOut = false;
   long lastLightsOut = 0;
   long lastBorder = 0;
+  long lastNightLight = 0;
+  bool nightLight = false;
   /*Habit sleep;
   Habit time;
   Habit workout;*/
@@ -78,27 +80,54 @@ namespace lights {
     return index;
   }
 
-  void off(Habit &config) {
-    int rgb = strip.Color(0, 0, 0);
-    strip.setPixelColor(config.sideLED, rgb);
+  void show() {
     strip.show();
     delay(100);
-    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
     matrix.show();
   }
 
-  void on(Habit &config) {
+  void sideOff(Habit &config) {
+    Color color = config.color;
+    int rgb = strip.Color(0, 0, 0);
+    strip.setPixelColor(config.sideLED, rgb);
+  }
+
+  void todayOff(Habit &config) {
+    Color color = config.color;
+    int rgb = strip.Color(0, 0, 0);
+    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
+  }
+
+  void off(Habit &config) {
+    sideOff(config);
+    todayOff(config);
+    show();
+  }
+
+  void sideOn(Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
     strip.setPixelColor(config.sideLED, rgb);
     strip.setBrightness(50);
-    strip.show();
-    delay(100);
-    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
-    matrix.show();
   }
 
-  void border() {
+  void todayOn(Habit &config) {
+    Color color = config.color;
+    int rgb = strip.Color(color.r, color.g, color.b);
+    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
+  }
+
+  void on(Habit &config) {
+    sideOn(config);
+    todayOn(config);
+    show();
+  }
+
+
+
+
+
+  void borderOn() {
     for(int col = 0; col < 24; col++) {
       matrix.setPixelColor(map(0, col), random(256), random(256), random(256)); // Top Left board 3
     }
@@ -110,6 +139,22 @@ namespace lights {
     }
     for (int row = 1; row < 7; row++) {
       matrix.setPixelColor(map(row, 23), random(256), random(256), random(256)); // Top Left board 3
+    }
+    matrix.show();
+  }
+
+  void borderOff() {
+    for(int col = 0; col < 24; col++) {
+      matrix.setPixelColor(map(0, col), 0,0,0); // Top Left board 3
+    }
+    for (int col = 0; col < 24; col++) {
+      matrix.setPixelColor(map(7, col), 0,0,0); // Top Left board 3
+    }
+    for (int row = 1; row < 7; row++) {
+      matrix.setPixelColor(map(row, 0), 0,0,0); // Top Left board 3
+    }
+    for (int row = 1; row < 7; row++) {
+      matrix.setPixelColor(map(row, 23), 0,0,0); // Top Left board 3
     }
     matrix.show();
   }
@@ -147,15 +192,21 @@ void completeHabit(state::HabitState &state, Habit &config) {
   Color color = config.color;
   //turnOn(sweets.sideLED, 4, strip.Color(sweets.color.r, sweets.color.g, sweets.color.b));
   //strip.setPixelColor(config.sideLED, strip.Color((color.r * b) >> 8, (color.g * b) >> 8, (color.b * b) >> 8));
-  lights::on(config);
-  // 30% chance a sound clip will play.
-  if(random(100) < 30) {
-    playRandomSound();
+  if(!state::lightsOut) {
+    lights::on(config);
+    // 30% chance a sound clip will play.
+    if(random(100) < 30) {
+      playRandomSound();
+    }
+  } else {
+    lights::todayOn(config);
+    lights::show();
   }
+
 }
 
 void checkDone(state::HabitState &state, Habit &config) {
-  if(!state.done && !state::lightsOut && buttons::isPressed(config)) {
+  if(!state.done && buttons::isPressed(config)) {
     completeHabit(state, config);
   }
 }
@@ -163,18 +214,27 @@ void checkDone(state::HabitState &state, Habit &config) {
 void nightLight() {
   //TODO: this isnt working as expected. throw a publish in here.
   if(isAnyDone() && state::lightsOut) {
-    if(buttons::isAnyPressed()) {
+    if(!state::nightLight && buttons::isAnyPressed()) {
       Particle.publish("ON Lights At Night");
-      lights::on(sweets);
-      lights::on(murder);
-      lights::on(brush);
-      state::lastLightsOut = millis();
-    } else if (millis() - state::lastLightsOut > 300000) {
+      if(state::sweets.done) {
+        lights::todayOn(sweets);
+      }
+      if(state::murder.done) {
+        lights::todayOn(murder);
+      }
+      if(state::brush.done) {
+        lights::todayOn(brush);
+      }
+      lights::show();
+      state::lastNightLight = millis();
+      state::nightLight = true;
+    } else if (state::nightLight && millis() - state::lastNightLight > 60000) {
       Particle.publish("OFF Lights At Night");
-      lights::off(sweets);
-      lights::off(murder);
-      lights::off(brush);
-      state::lastLightsOut = millis();
+      lights::todayOff(sweets);
+      lights::todayOff(murder);
+      lights::todayOff(brush);
+      lights::show();
+      state::nightLight = false;
     }
   }
 }
@@ -265,6 +325,7 @@ void handleLightsOut(int light) {
   state::lightsOut = true;
   state::lastLightsOut = millis();
   Particle.publish("lights out!", String(light));
+  lights::borderOff();
   lights::off(sweets);
   lights::off(murder);
   lights::off(brush);
@@ -289,7 +350,9 @@ void loop() {
   matrix.setPixelColor(map(0, 16), 255, 0, 0); // Top Left board 3*/
 
   if(millis() - state::lastBorder > 2000) {
-    lights::border();
+    if(!state::lightsOut) {
+      lights::borderOn();
+    }
     //Particle.publish("state", "sweets: " + String(state::sweets.done) + " " + String(sweets.sideLED) + " " + String(state::sweets.doneTime) + " murder: " + state::murder.done + " " + String(murder.sideLED) + " brush: " + String(state::brush.done) );
     state::lastBorder = millis();
   }
