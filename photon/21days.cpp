@@ -10,7 +10,6 @@ Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &Serial1);
 Adafruit_NeoPixel matrix = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 int LEDinterval = 10;
-
 Habit sweets = {
   Pushbutton(D0, false, 0),
   0,
@@ -26,7 +25,24 @@ Habit murder = {
 Habit brush = {
   Pushbutton(D2, false, 0),
   2,
+  {144, 0, 255}
+};
+Habit sleep = {
+  Pushbutton(D3, false, 0),
+  3,
   {0, 158, 255}
+};
+
+Habit workout = {
+  Pushbutton(D4, false, 0),
+  4,
+  {255, 255, 0}
+};
+
+Habit onTime = {
+  Pushbutton(D5, false, 0),
+  5,
+  {255, 158, 0}
 };
 
 namespace state {
@@ -34,19 +50,32 @@ namespace state {
     long previousMillis;
     int brightness;
     bool done;
+    bool history [21];
     int doneTime;
   } HabitState;
 
   HabitState sweets = {
-    0, 0, 0, -1
+    0, 0, 0, {false}, -1
   };
 
   HabitState murder = {
-    0, 0, 0, -1
+    0, 0, 0, {false}, -1
   };
 
   HabitState brush = {
-    0, 0, 0, -1
+    0, 0, 0, {false}, -1
+  };
+
+  HabitState sleep = {
+    0, 0, 0, {false}, -1
+  };
+
+  HabitState workout = {
+    0, 0, 0, {false}, -1
+  };
+
+  HabitState onTime = {
+    0, 0, 0, {false}, -1
   };
 
   long lastShow = 0;
@@ -55,27 +84,26 @@ namespace state {
   long lastBorder = 0;
   long lastNightLight = 0;
   bool nightLight = false;
-  /*Habit sleep;
-  Habit time;
-  Habit workout;*/
 };
 
 
 namespace lights {
   int map(int row, int column) {
     //0-7, 64-71, 128-135
-    int index = row * 8 + column; // 0 - 63
+    int LEDsPerBoard = 64;
+    int boardWidth = 8;
+    int index = row * boardWidth + column; // 0 - 63
     // r: 1, c: 1. 9
     // r: 0, c: 7. 7
     // r: 3, c: 0. 24
     // r: 7, c: 7. 63
     if(column >= 8 && column <= 15) {
-      index = index + 64 - 8;
+      index = index + LEDsPerBoard - boardWidth;
       // r: 0 c: 8. 64
       // r: 1 c: 8. 73
       // r: 7 c: 16
     } else if(column >= 16 && column <= 23) {
-      index = index + 2 * (64 - 8);
+      index = index + 2 * (LEDsPerBoard - boardWidth);
     }
     return index;
   }
@@ -117,15 +145,21 @@ namespace lights {
     matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
   }
 
+  void historyOn(state::HabitState &state, Habit &config) {
+    Color color = config.color;
+    int rgb = strip.Color(color.r, color.g, color.b);
+    for (unsigned int day = 0; day < sizeof(state.history); day++) {
+      if(state.history[day]) {
+        matrix.setPixelColor(map(config.sideLED + 1, day + 1), rgb);
+      }
+    }
+  }
+
   void on(Habit &config) {
     sideOn(config);
     todayOn(config);
     show();
   }
-
-
-
-
 
   void borderOn() {
     for(int col = 0; col < 24; col++) {
@@ -270,6 +304,22 @@ void setup() {
 
     matrix.begin();
     matrix.setBrightness(15);
+    //bool proto [] = {false, false, true, true, false, false, false, true, true, false, true, false, true, true, false, false, false, true, true, false, true};
+    for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
+      state::sweets.history[day] = (random(100) < 49);
+      state::murder.history[day] = (random(100) < 49);
+      state::brush.history[day] = (random(100) < 49);
+      state::sleep.history[day] = (random(100) < 49);
+      state::workout.history[day] = (random(100) < 49);
+      state::onTime.history[day] = (random(100) < 49);
+    }
+    lights::historyOn(state::sweets, sweets);
+    lights::historyOn(state::brush, brush);
+    lights::historyOn(state::murder, murder);
+    lights::historyOn(state::sleep, sleep);
+    lights::historyOn(state::workout, workout);
+    lights::historyOn(state::onTime, onTime);
+
     delay(100);
     matrix.show(); // Initialize all pixels to 'off'
     Particle.function("habit", remoteCompleteHabit);
