@@ -5,68 +5,82 @@ import {
   StyleSheet,
   Text,
   TouchableHighlight,
-  View
+  View, 
+  Image,
+  Dimensions,
+  StatusBar
 } from 'react-native';
 
 export default class test extends Component {
     _onPressButtonBrush() {
       console.log("BRUSH")
-      // completeHabit('brush')
+      completeHabit('brush')
       testLog();
     }
 
     _onPressButtonTime() {
       console.log("TIME")
-      // completeHabit('time')
+     completeHabit('onTime')
     }
 
     _onPressButtonMurder() {
       console.log("MURDER")
-      // completeHabit('murder')
+      completeHabit('murder')
     }
 
     _onPressButtonSleep() {
       console.log("SLEEP")
-      // completeHabit('time')
+      completeHabit('sleep')
     }
 
     _onPressButtonWorkout() {
       console.log("WORKOUT")
-      // completeHabit('time')
+      completeHabit('workout')
     }
 
     _onPressButtonSweets() {
       console.log("SWEETS")
-      // completeHabit('time')
+      completeHabit('sweets')
     }
 
 
   render() {
+    var deviceWidth = Dimensions.get('window').width;
+    const styles = {
+      image: {
+        resizeMode: 'contain',
+        width: deviceWidth / 2,
+        height: deviceWidth / 2
+      }
+    }
     return (
-      <View style={{flex: 1, marginTop: 60}}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.05)', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-            <TouchableHighlight onPress={this._onPressButtonBrush}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={this._onPressButtonTime}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={this._onPressButtonMurder}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-          </View>
-          <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.05)', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-            <TouchableHighlight onPress={this._onPressButtonSleep}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={this._onPressButtonWorkout}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={this._onPressButtonSweets}>
-              <View style={{height: 150, width: 150, padding: 25, backgroundColor: 'steelblue', margin: 5}}/>
-            </TouchableHighlight>
-          </View>
+      <View style={{flex: 1, backgroundColor: 'black'}}>
+        <StatusBar
+          barStyle='light-content'
+        />
+        <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <TouchableHighlight onPress={this._onPressButtonBrush}>
+                  <Image style={styles.image} source={require('./img/brush.jpg')} />
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this._onPressButtonTime}>
+                  <Image style={styles.image} source={require('./img/onTime.jpg')}/>
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this._onPressButtonMurder}>
+                  <Image style={styles.image} source={require('./img/murder.jpg')}/>
+                </TouchableHighlight>
+            </View>
+            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <TouchableHighlight onPress={this._onPressButtonSleep}>
+                  <Image style={styles.image} source={require('./img/sleep.jpg')}/>
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this._onPressButtonWorkout}>
+                  <Image style={styles.image} source={require('./img/workout.jpg')}/>
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this._onPressButtonSweets}>
+                  <Image style={styles.image} source={require('./img/sweets.jpg')}/>
+                </TouchableHighlight>
+            </View>
         </View>
       </View>
     );

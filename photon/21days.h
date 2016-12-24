@@ -5,6 +5,8 @@
 
 int remoteCompleteHabit(String habit);
 
+
+
 typedef struct {
   uint16_t r;
   uint16_t g;
@@ -12,10 +14,19 @@ typedef struct {
 } Color;
 
 typedef struct {
+    double h;       // angle in degrees
+    double s;       // percent
+    double v;       // percent
+} hsv;
+
+typedef struct {
   Pushbutton button;
   int sideLED;
   Color color;
 } Habit;
+
+hsv rgb2hsv(Color in);
+Color hsv2rgb(hsv in);
 
 namespace lights {
   int map(int row, int column);
