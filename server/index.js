@@ -15,7 +15,7 @@ var pg = require('pg');
 // });
 
 app.get('/habits', function (request, response) {
-    var id = process.evn.PARTICLE_ID;
+    var id = process.env.PARTICLE_ID;
     if(id === request.query.id) {
         var user = request.query.user;
         var query = "SELECT (habit, completedDate) FROM public.habit WHERE user_email = '" + user + "'";
