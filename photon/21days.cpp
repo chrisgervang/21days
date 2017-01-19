@@ -333,17 +333,17 @@ void morning() {
 
 void gradientHistory() {
   for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
-    Color c1 = hsv2rgb({120, 100, 100});
+    Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(sweets.sideLED + 1, day + 1), c1.r, c1.g, c1.b);
-    Color c2 = hsv2rgb({350, 100, 100});
+    Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(murder.sideLED + 1, day + 1), c2.r, c2.g, c2.b);
-    Color c3 = hsv2rgb({273, 100, 100});
+    Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(brush.sideLED + 1, day + 1), c3.r, c3.g, c3.b);
-    Color c4 = hsv2rgb({201, 100, 100});
+    Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(sleep.sideLED + 1, day + 1), c4.r, c4.g, c4.b);
-    Color c5 = hsv2rgb({36, 100, 100});
+    Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(workout.sideLED + 1, day + 1), c5.r, c5.g, c5.b);
-    Color c6 = hsv2rgb({52, 100, 100});
+    Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
     matrix.setPixelColor(lights::map(onTime.sideLED + 1, day + 1), c6.r, c6.g, c6.b);
   }
 }
@@ -363,18 +363,18 @@ void setup() {
     strip.show();
 
     matrix.begin();
-    matrix.setBrightness(15);
+    matrix.setBrightness(100);
     Time.zone(-8);
 
     state::dayStamp = Time.now();
     weekendBorder();
-    gradientHistory();
+    //gradientHistory();
     delay(100);
     matrix.show(); // Initialize all pixels to 'off'
 
-    hsv test = {350, 100, 50};
-    Color t2 = hsv2rgb(test);
-    Particle.publish("test", String(t2.r) + String(t2.b) + String(t2.g));
+    // hsv test = {350, 100, 50};
+    // Color t2 = hsv2rgb(test);
+    // Particle.publish("test", String(t2.r) + String(t2.b) + String(t2.g));
     Particle.function("habit", remoteCompleteHabit);
     Particle.publish("DSTTYFSWTYF", "Do something today that your future self will thank you for!");
     Particle.publish("Time", Time.format(state::dayStamp, TIME_FORMAT_ISO8601_FULL));
