@@ -26,7 +26,7 @@ app.get('/habits', function (request, response) {
                     console.error(err);
                     response.send("Error " + err);
                 } else {
-                    response.send("Success " + result);
+                    response.send("Success " + JSON.stringify(result));
                 }
             })
         })
