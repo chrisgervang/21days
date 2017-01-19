@@ -37,7 +37,7 @@ app.get('/habits', function (request, response) {
 })
 
 app.get('/track', function (request, response) {
-    var id = process.evn.PARTICLE_ID;
+    var id = process.env.PARTICLE_ID;
     if(id === request.query.id) {
         var habit = request.query.habit;
         var user = request.query.user;
