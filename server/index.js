@@ -9,7 +9,7 @@ app.get('/db', function (request, response) {
       if (err)
        { console.error(err); response.send("Error " + err); }
       else
-       { response.render('pages/db', {results: result.rows} ); }
+       { response.json({results: result.rows} ); }
     });
   });
 });
@@ -23,7 +23,7 @@ app.set('port', (process.env.PORT || 5000));
 // app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-  response.render('pages/index');
+  response.send('pages/index');
 });
 
 app.listen(app.get('port'), function() {
