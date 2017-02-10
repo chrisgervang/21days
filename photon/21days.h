@@ -22,8 +22,18 @@ typedef struct {
 typedef struct {
   Pushbutton button;
   int sideLED;
+  int matrixRow;
   Color color;
 } Habit;
+
+typedef struct {
+  int duration;
+  bool looping;
+} AnimationConfig;
+
+typedef struct {
+  int lastFrame;
+} AnimationState
 
 hsv rgb2hsv(Color in);
 Color hsv2rgb(hsv in);

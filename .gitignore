@@ -2,3 +2,5 @@
 ios/token.js
 
 *.bin
+
+server/node_modules

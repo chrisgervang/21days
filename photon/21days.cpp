@@ -3,7 +3,7 @@
 
 #define NUMPIXELS 3 // Number of Pixies in the strip
 // IMPORTANT: Set pixel COUNT, PIN and TYPE
-#define PIXEL_PIN D7
+#define PIXEL_PIN D0
 #define PIXEL_COUNT 192
 #define PIXEL_TYPE WS2812B
 Adafruit_Pixie strip = Adafruit_Pixie(NUMPIXELS, &Serial1);
@@ -11,71 +11,79 @@ Adafruit_NeoPixel matrix = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE)
 
 int LEDinterval = 10;
 Habit sweets = {
-  Pushbutton(D0, false, 0),
+  Pushbutton(D1, false, 0),
   0,
+  4,
   {0, 255, 0}
 };
 
+Habit workout = {
+  Pushbutton(D2, false, 0),
+  1,
+  3,
+  {255, 255, 0}
+};
+
+Habit sleep = {
+  Pushbutton(D3, false, 0),
+  2,
+  5,
+  {0, 158, 255}
+};
+
 Habit murder = {
-  Pushbutton(D1, false, 0),
+  Pushbutton(D4, false, 0),
+  3,
   1,
   {255, 0, 25}
 };
 
-Habit brush = {
-  Pushbutton(D2, false, 0),
-  2,
-  {144, 0, 255}
-};
-Habit sleep = {
-  Pushbutton(D3, false, 0),
-  3,
-  {0, 158, 255}
-};
-
-Habit workout = {
-  Pushbutton(D4, false, 0),
-  4,
-  {255, 255, 0}
-};
-
 Habit onTime = {
   Pushbutton(D5, false, 0),
-  5,
+  4,
+  2,
   {255, 158, 0}
 };
+
+Habit brush = {
+  Pushbutton(D6, false, 0),
+  5,
+  6,
+  {144, 0, 255}
+};
+
 
 namespace state {
   typedef struct {
     long previousMillis;
     int brightness;
-    bool done;
     bool history [21];
+    bool done;
     int doneTime;
   } HabitState;
 
   HabitState sweets = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   HabitState murder = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   HabitState brush = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   HabitState sleep = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   HabitState workout = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   HabitState onTime = {
-    0, 0, 0, {false}, -1
+    0, 255, 0, {false}, -1
   };
 
   long lastShow = 0;
@@ -124,7 +132,7 @@ namespace lights {
   void todayOff(Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(0, 0, 0);
-    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
+    matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
   void off(Habit &config) {
@@ -136,13 +144,13 @@ namespace lights {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
     strip.setPixelColor(config.sideLED, rgb);
-    strip.setBrightness(50);
+    strip.setBrightness(127);
   }
 
   void todayOn(Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
-    matrix.setPixelColor(map(config.sideLED + 1, 22), rgb);
+    matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
   void historyOn(state::HabitState &state, Habit &config) {
@@ -150,9 +158,9 @@ namespace lights {
     int rgb = strip.Color(color.r, color.g, color.b);
     for (unsigned int day = 0; day < sizeof(state.history); day++) {
       if(state.history[day]) {
-        matrix.setPixelColor(map(config.sideLED + 1, day + 1), rgb);
+        matrix.setPixelColor(map(config.matrixRow, day + 1), rgb);
       } else {
-        matrix.setPixelColor(map(config.sideLED + 1, day + 1), 0, 0, 0);
+        matrix.setPixelColor(map(config.matrixRow, day + 1), 0, 0, 0);
       }
     }
   }
@@ -219,17 +227,17 @@ void playRandomSound() {
 }*/
 
 void completeHabit(state::HabitState &state, Habit &config) {
-  Particle.publish("Habit Done!", String(config.sideLED));
+  Particle.publish("Habit Done!", String(config.matrixRow));
   state.done = true;
   state.doneTime = Time.now();
   Color color = config.color;
   //turnOn(sweets.sideLED, 4, strip.Color(sweets.color.r, sweets.color.g, sweets.color.b));
-  //strip.setPixelColor(config.sideLED, strip.Color((color.r * b) >> 8, (color.g * b) >> 8, (color.b * b) >> 8));
+  //strip.setPixelColor(config.sideLED + 1, strip.Color((color.r * b) >> 8, (color.g * b) >> 8, (color.b * b) >> 8));
   if(!state::lightsOut) {
     lights::on(config);
     lights::show();
-    // 30% chance a sound clip will play.
-    if(random(100) < 30) {
+    // 15% chance a sound clip will play.
+    if(random(100) < 15) {
       playRandomSound();
     }
   } else {
@@ -238,11 +246,31 @@ void completeHabit(state::HabitState &state, Habit &config) {
   }
 
 }
-
+bool up = false;
 void checkDone(state::HabitState &state, Habit &config) {
   if(!state.done && buttons::isPressed(config)) {
     completeHabit(state, config);
+    state.previousMillis = millis();
+
+  } else if (state.done && millis() - state.previousMillis > 100) {
+    if (state.brightness < 255 && up) {
+      state.brightness += 1;
+      if(state.brightness == 255) {
+        up = false;
+      }
+    } else if (state.brightness > 0 && !up) {
+      state.brightness -= 1;
+      if(state.brightness == 0) {
+        up = true;
+      }
+    }
+    //Particle.publish("dim", String(state.brightness));
+    matrix.setColorScaled(lights::map(config.matrixRow, 22), config.color.r, config.color.g, config.color.b, state.brightness);
+    state.previousMillis = millis();
+    matrix.show();
+
   }
+
 }
 
 void nightLight() {
@@ -292,13 +320,13 @@ void processEndOfDay(state::HabitState &state, Habit &config) {
 
 void weekendBorder() {
   long currentDay = state::dayStamp;
-  int rgb = strip.Color(255, 255, 255);
+  //int rgb = strip.Color(255, 255, 255);
 
   for(unsigned int day = 22; day > 0; day--) {
     int weekday = Time.weekday(currentDay);
     if(weekday == 1 || weekday == 7) {
-      matrix.setPixelColor(lights::map(7, day), rgb);
-      matrix.setPixelColor(lights::map(0, day), rgb);
+      matrix.setColorDimmed(lights::map(7, day), 255, 255, 255, 100);
+      matrix.setColorDimmed(lights::map(0, day), 255, 255, 255, 100);
     } else {
       matrix.setPixelColor(lights::map(7, day), 0, 0, 0);
       matrix.setPixelColor(lights::map(0, day), 0, 0, 0);
@@ -334,17 +362,17 @@ void morning() {
 void gradientHistory() {
   for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
     Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(sweets.sideLED + 1, day + 1), c1.r, c1.g, c1.b);
+    matrix.setPixelColor(lights::map(sweets.matrixRow, day + 1), c1.r, c1.g, c1.b);
     Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(murder.sideLED + 1, day + 1), c2.r, c2.g, c2.b);
+    matrix.setPixelColor(lights::map(murder.matrixRow, day + 1), c2.r, c2.g, c2.b);
     Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(brush.sideLED + 1, day + 1), c3.r, c3.g, c3.b);
+    matrix.setPixelColor(lights::map(brush.matrixRow, day + 1), c3.r, c3.g, c3.b);
     Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(sleep.sideLED + 1, day + 1), c4.r, c4.g, c4.b);
+    matrix.setPixelColor(lights::map(sleep.matrixRow, day + 1), c4.r, c4.g, c4.b);
     Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(workout.sideLED + 1, day + 1), c5.r, c5.g, c5.b);
+    matrix.setPixelColor(lights::map(workout.matrixRow, day + 1), c5.r, c5.g, c5.b);
     Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(onTime.sideLED + 1, day + 1), c6.r, c6.g, c6.b);
+    matrix.setPixelColor(lights::map(onTime.matrixRow, day + 1), c6.r, c6.g, c6.b);
   }
 }
 

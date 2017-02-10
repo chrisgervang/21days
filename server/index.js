@@ -14,11 +14,12 @@ var pg = require('pg');
 //   });
 // });
 
+// Use: https://server-21days.herokuapp.com/habits?id=4d001f000151353338363333&user=chris@gervang.com
 app.get('/habits', function (request, response) {
     var id = process.env.PARTICLE_ID;
     if(id === request.query.id) {
         var user = request.query.user;
-        var query = "SELECT (habit, completedDate) FROM public.habit WHERE user_email = '" + user + "'";
+        var query = "SELECT habit AS habit, completedDate AS completedDate FROM public.habit WHERE user_email = '" + user + "'";
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             client.query(query, function(err, result) {
                 done();
@@ -26,7 +27,7 @@ app.get('/habits', function (request, response) {
                     console.error(err);
                     response.send("Error " + err);
                 } else {
-                    response.json(result);
+                    response.json(result.rows);
                 }
             })
         })
