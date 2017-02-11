@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var pg = require('pg');
+var moment = require('moment');
 
 // app.get('/db', function (request, response) {
 //   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
@@ -40,44 +41,97 @@ app.get('/habits', function (request, response) {
     }
 })
 
-const ID_TO_USER = `SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $1::text`
+const ID_TO_HISTORY = 
+`WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $1::text)
+SELECT habit AS habit, completedDate AS completedDate 
+FROM public.habit 
+WHERE user_email = (SELECT email FROM owner) AND completedDate > current_date::date - INTERVAL '22 days'`
+
+function isAuthenticated(request) {
+    var key = process.env.API_KEY;
+    return key === request.headers.api_key
+}
+
+function makeHistory(rows) {
+    const TwentyTwoDaysAgo = moment().startOf('day').subtract(21, 'days');
+    var habitsHistory ={
+        "brush twice": [],
+        "dont murder": [],
+        "no sweets": [],
+        "workout": [],
+        "sleep by 12am": [],
+        "on time": []
+    }
+    for (var day = 0; day < 22; day++) {
+        var date = moment(TwentyTwoDaysAgo).add(day, 'day');
+        // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
+        var completed = rows.filter((row) => {
+            return moment(row.completeddate).isSame(date, 'day');
+        });
+
+        if(completed.length > 6) console.error("completed length is over 6: " + completed.length)
+        for(var habit in habitsHistory) {
+            var found = completed.find((val) => {
+                return val.habit === habit
+            })
+
+            if(!!found) {
+                console.log("completed", found.habit, found.completeddate)
+                habitsHistory[habit].push(1)
+            } else {
+                habitsHistory[habit].push(0)
+            }
+        }      
+    }
+    console.log(JSON.stringify(habitsHistory))
+
+    var history = "";
+    Object.keys(habitsHistory).forEach(function(habit, index, keys){
+        const historyOfHabit = habitsHistory[habit].reduce((prev, curr) => {
+            return prev += String(curr)
+        }, "")
+        console.log(historyOfHabit)
+        history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
+    })
+    return history
+}
 
 app.get('/device/history', function (request, response) {
-    var key = process.env.API_KEY;
-    //console.log(key, request.headers)
-    if(key === request.headers.api_key) {
+    if(isAuthenticated(request)) {
+
+
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            client.query(ID_TO_USER, [request.headers.coreid], function(err, result) {
+            client.query(ID_TO_HISTORY, [request.headers.coreid], function(err, result) {
                 done();
                 if(err) {
                     console.error(err);
                     response.send("Error " + err);
                 } else {
-                    if(result.rows.length === 1) {
-                        response.json(result.rows[0].email);
-                    } else {
-                        response.json(result)
-                    }
+
+                    response.send(makeHistory(result.rows));
+                    
                 }
             })
         })
-
-
-
     } else {
         console.error("Auth no good");
         response.send("Error: Auth no good");
     }
 })
 
-app.get('/track', function (request, response) {
-    var id = process.env.PARTICLE_ID;
-    if(id === request.query.id) {
-        var habit = request.query.habit;
-        var user = request.query.user;
-        var query = "INSERT INTO public.habit (habit, user_email) VALUES ('" + habit + "', '" + user + "')";
+const INSERT_HABIT = 
+`WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $2::text)
+INSERT INTO public.habit (habit, user_email) 
+VALUES ($1::text, (SELECT email FROM owner))`;
+
+
+app.get('/device/track', function (request, response) {
+    if(isAuthenticated(request)) {
+        var habit = request.headers.data;
+        var id = request.headers.coreid;
+
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            client.query(query, function(err, result) {
+            client.query(INSERT_HABIT, [habit, id], function(err, result) {
                 done();
                 if(err) {
                     console.error(err);

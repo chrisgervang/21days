@@ -4,8 +4,7 @@
 #include "neopixel.h"
 
 int remoteCompleteHabit(String habit);
-
-
+void handleHistory(const char *event, const char *data);
 
 typedef struct {
   uint16_t r;
@@ -13,11 +12,11 @@ typedef struct {
   uint16_t b;
 } Color;
 
-typedef struct {
-    double h;       // angle in degrees
-    double s;       // percent
-    double v;       // percent
-} hsv;
+// typedef struct {
+//     double h;       // angle in degrees
+//     double s;       // percent
+//     double v;       // percent
+// } hsv;
 
 typedef struct {
   Pushbutton button;
@@ -33,10 +32,10 @@ typedef struct {
 
 typedef struct {
   int lastFrame;
-} AnimationState
+} AnimationState;
 
-hsv rgb2hsv(Color in);
-Color hsv2rgb(hsv in);
+// hsv rgb2hsv(Color in);
+// Color hsv2rgb(hsv in);
 
 namespace lights {
   int map(int row, int column);

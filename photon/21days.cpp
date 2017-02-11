@@ -63,27 +63,27 @@ namespace state {
   } HabitState;
 
   HabitState sweets = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   HabitState murder = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   HabitState brush = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   HabitState sleep = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   HabitState workout = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   HabitState onTime = {
-    0, 255, 0, {false}, -1
+    0, 255, {false}, false, -1
   };
 
   long lastShow = 0;
@@ -359,23 +359,27 @@ void morning() {
   }
 }
 
-void gradientHistory() {
-  for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
-    Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(sweets.matrixRow, day + 1), c1.r, c1.g, c1.b);
-    Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(murder.matrixRow, day + 1), c2.r, c2.g, c2.b);
-    Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(brush.matrixRow, day + 1), c3.r, c3.g, c3.b);
-    Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(sleep.matrixRow, day + 1), c4.r, c4.g, c4.b);
-    Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(workout.matrixRow, day + 1), c5.r, c5.g, c5.b);
-    Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
-    matrix.setPixelColor(lights::map(onTime.matrixRow, day + 1), c6.r, c6.g, c6.b);
-  }
-}
+// void gradientHistory() {
+//   for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
+//     Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(sweets.matrixRow, day + 1), c1.r, c1.g, c1.b);
+//     Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(murder.matrixRow, day + 1), c2.r, c2.g, c2.b);
+//     Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(brush.matrixRow, day + 1), c3.r, c3.g, c3.b);
+//     Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(sleep.matrixRow, day + 1), c4.r, c4.g, c4.b);
+//     Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(workout.matrixRow, day + 1), c5.r, c5.g, c5.b);
+//     Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
+//     matrix.setPixelColor(lights::map(onTime.matrixRow, day + 1), c6.r, c6.g, c6.b);
+//   }
+// }
 
+void handleHistory(const char *event, const char *data) {
+  // Handle the webhook response
+  Particle.publish("result", data);
+}
 
 void setup() {
     /*Serial.begin(9600);
@@ -406,6 +410,8 @@ void setup() {
     Particle.function("habit", remoteCompleteHabit);
     Particle.publish("DSTTYFSWTYF", "Do something today that your future self will thank you for!");
     Particle.publish("Time", Time.format(state::dayStamp, TIME_FORMAT_ISO8601_FULL));
+    Particle.publish("history", "", PRIVATE);
+    Particle.subscribe("hook-response/history", handleHistory, MY_DEVICES);
 }
 
 void randomHistory() {
@@ -548,109 +554,109 @@ void turnOn(uint8_t pixel, uint8_t duration, uint32_t color) {
     }
 }
 
-hsv rgb2hsv(Color in)
-{
-    hsv         out;
-    double      min, max, delta;
-
-    min = in.r < in.g ? in.r : in.g;
-    min = min  < in.b ? min  : in.b;
-
-    max = in.r > in.g ? in.r : in.g;
-    max = max  > in.b ? max  : in.b;
-
-    out.v = max;                                // v
-    delta = max - min;
-    if (delta < 0.00001)
-    {
-        out.s = 0;
-        out.h = 0; // undefined, maybe nan?
-        return out;
-    }
-    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
-        out.s = (delta / max);                  // s
-    } else {
-        // if max is 0, then r = g = b = 0
-            // s = 0, v is undefined
-        out.s = 0.0;
-        out.h = 0.0;                            // its now undefined
-        return out;
-    }
-    if( in.r >= max )                           // > is bogus, just keeps compilor happy
-        out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
-    else
-    if( in.g >= max )
-        out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
-    else
-        out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
-
-    out.h *= 60.0;                              // degrees
-
-    if( out.h < 0.0 )
-        out.h += 360.0;
-
-    return out;
-}
-
-
-Color hsv2rgb(hsv in)
-{
-    double      hh, p, q, t, ff;
-    long        i;
-    Color       out;
-
-    if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
-        out.r = in.v;
-        out.g = in.v;
-        out.b = in.v;
-        return out;
-    }
-    hh = in.h;
-    if(hh >= 360.0) hh = 0.0;
-    hh /= 60.0;
-    i = (long)hh;
-    ff = hh - i;
-    p = in.v * (1.0 - in.s);
-    q = in.v * (1.0 - (in.s * ff));
-    t = in.v * (1.0 - (in.s * (1.0 - ff)));
-
-    switch(i) {
-    case 0:
-        out.r = in.v;
-        out.g = t;
-        out.b = p;
-        break;
-    case 1:
-        out.r = q;
-        out.g = in.v;
-        out.b = p;
-        break;
-    case 2:
-        out.r = p;
-        out.g = in.v;
-        out.b = t;
-        break;
-
-    case 3:
-        out.r = p;
-        out.g = q;
-        out.b = in.v;
-        break;
-    case 4:
-        out.r = t;
-        out.g = p;
-        out.b = in.v;
-        break;
-    case 5:
-    default:
-        out.r = in.v;
-        out.g = p;
-        out.b = q;
-        break;
-    }
-    out.r = map(out.r, 0, 100, 0, 255);
-    out.g = map(out.g, 0, 100, 0, 255);
-    out.b = map(out.b, 0, 100, 0, 255);
-
-    return out;
-}
+// hsv rgb2hsv(Color in)
+// {
+//     hsv         out;
+//     double      min, max, delta;
+//
+//     min = in.r < in.g ? in.r : in.g;
+//     min = min  < in.b ? min  : in.b;
+//
+//     max = in.r > in.g ? in.r : in.g;
+//     max = max  > in.b ? max  : in.b;
+//
+//     out.v = max;                                // v
+//     delta = max - min;
+//     if (delta < 0.00001)
+//     {
+//         out.s = 0;
+//         out.h = 0; // undefined, maybe nan?
+//         return out;
+//     }
+//     if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+//         out.s = (delta / max);                  // s
+//     } else {
+//         // if max is 0, then r = g = b = 0
+//             // s = 0, v is undefined
+//         out.s = 0.0;
+//         out.h = 0.0;                            // its now undefined
+//         return out;
+//     }
+//     if( in.r >= max )                           // > is bogus, just keeps compilor happy
+//         out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
+//     else
+//     if( in.g >= max )
+//         out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
+//     else
+//         out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
+//
+//     out.h *= 60.0;                              // degrees
+//
+//     if( out.h < 0.0 )
+//         out.h += 360.0;
+//
+//     return out;
+// }
+//
+//
+// Color hsv2rgb(hsv in)
+// {
+//     double      hh, p, q, t, ff;
+//     long        i;
+//     Color       out;
+//
+//     if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
+//         out.r = in.v;
+//         out.g = in.v;
+//         out.b = in.v;
+//         return out;
+//     }
+//     hh = in.h;
+//     if(hh >= 360.0) hh = 0.0;
+//     hh /= 60.0;
+//     i = (long)hh;
+//     ff = hh - i;
+//     p = in.v * (1.0 - in.s);
+//     q = in.v * (1.0 - (in.s * ff));
+//     t = in.v * (1.0 - (in.s * (1.0 - ff)));
+//
+//     switch(i) {
+//     case 0:
+//         out.r = in.v;
+//         out.g = t;
+//         out.b = p;
+//         break;
+//     case 1:
+//         out.r = q;
+//         out.g = in.v;
+//         out.b = p;
+//         break;
+//     case 2:
+//         out.r = p;
+//         out.g = in.v;
+//         out.b = t;
+//         break;
+//
+//     case 3:
+//         out.r = p;
+//         out.g = q;
+//         out.b = in.v;
+//         break;
+//     case 4:
+//         out.r = t;
+//         out.g = p;
+//         out.b = in.v;
+//         break;
+//     case 5:
+//     default:
+//         out.r = in.v;
+//         out.g = p;
+//         out.b = q;
+//         break;
+//     }
+//     out.r = map(out.r, 0, 100, 0, 255);
+//     out.g = map(out.g, 0, 100, 0, 255);
+//     out.b = map(out.b, 0, 100, 0, 255);
+//
+//     return out;
+// }
