@@ -387,16 +387,18 @@ void morning() {
 //   }
 // }
 
-void handleHistory(const char *event, char *data) {
+void handleHistory(const char *event, const char *data) {
   // Handle the webhook response
   StaticJsonBuffer<400> jsonBuffer;
-  //char *json = *data;
-  JsonObject& root = jsonBuffer.parseObject(data);
+  int length = strlen(data) + 1;
+  char json[length];
+  strcpy(json, data);
+
+  JsonObject& root = jsonBuffer.parseObject(json);
 
   if (!root.success())
   {
     Particle.publish("parseObject() failed");
-    return;
   }
 
   JsonArray& brushTwice = root["brush twice"];

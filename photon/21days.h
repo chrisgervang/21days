@@ -7,6 +7,10 @@
 int remoteCompleteHabit(String habit);
 void handleHistory(const char *event, const char *data);
 
+void setup();
+
+void loop();
+
 typedef struct {
   uint16_t r;
   uint16_t g;
