@@ -79,9 +79,9 @@ function makeHistory(rows) {
 
             if(!!found) {
                 console.log("completed", found.habit, found.completeddate)
-                habitsHistory[habit].push(true)
+                habitsHistory[habit].push(1)
             } else {
-                habitsHistory[habit].push(false)
+                habitsHistory[habit].push(0)
             }
         }      
     }

@@ -389,7 +389,7 @@ void morning() {
 
 void handleHistory(const char *event, const char *data) {
   // Handle the webhook response
-  StaticJsonBuffer<400> jsonBuffer;
+  StaticJsonBuffer<1000> jsonBuffer;
   int length = strlen(data) + 1;
   char json[length];
   strcpy(json, data);
@@ -401,7 +401,7 @@ void handleHistory(const char *event, const char *data) {
     Particle.publish("parseObject() failed");
   }
 
-  JsonArray& brushTwice = root["brush twice"];
+  JsonArray& brushTwice = root["history"]["brush twice"];
   bool bt [22];
   int index = 0;
   for(JsonArray::iterator it=brushTwice.begin(); it!=brushTwice.end(); ++it) {
@@ -413,7 +413,7 @@ void handleHistory(const char *event, const char *data) {
   *state::brush.history = *bt;
   lights::historyOn(state::brush, brush);
 
-  Particle.publish("result", data);
+  Particle.publish("result", json);
 }
 
 void setup() {
