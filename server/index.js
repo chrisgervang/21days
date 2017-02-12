@@ -110,7 +110,7 @@ app.post('/device/history', function (request, response) {
                     response.send("Error " + err);
                 } else {
 
-                    response.send(makeHistory(result.rows));
+                    response.send(makeHistory(result.rows), response.set('Content-Type', 'text/plain'));
                     
                 }
             })
