@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var pg = require('pg');
 var moment = require('moment');
+var bodyParser = require('body-parser');
 
 // app.get('/db', function (request, response) {
 //   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
@@ -17,6 +18,7 @@ var moment = require('moment');
 
 const habits = ["brush twice", "dont murder", "no sweets", "workout", "sleep by 12am", "on time"]
 
+app.use(bodyParser.json({limit: "5mb"}));
 
 // Use: https://server-21days.herokuapp.com/habits?user=chris@gervang.com&key=****
 app.get('/habits', function (request, response) {
@@ -49,7 +51,7 @@ WHERE user_email = (SELECT email FROM owner) AND completedDate > current_date::d
 
 function isAuthenticated(request) {
     var key = process.env.API_KEY;
-    return key === request.headers.api_key
+    return key === request.body.api_key
 }
 
 function makeHistory(rows) {
@@ -96,12 +98,12 @@ function makeHistory(rows) {
     return history
 }
 
-app.get('/device/history', function (request, response) {
+app.post('/device/history', function (request, response) {
     if(isAuthenticated(request)) {
 
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            client.query(ID_TO_HISTORY, [request.headers.coreid], function(err, result) {
+            client.query(ID_TO_HISTORY, [request.body.coreid], function(err, result) {
                 done();
                 if(err) {
                     console.error(err);
@@ -125,7 +127,7 @@ INSERT INTO public.habit (habit, user_email)
 VALUES ($1::text, (SELECT email FROM owner))`;
 
 
-app.get('/device/track', function (request, response) {
+app.post('/device/track', function (request, response) {
     if(isAuthenticated(request)) {
         var habit = request.headers.data;
         var id = request.headers.coreid;
