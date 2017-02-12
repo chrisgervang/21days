@@ -57,33 +57,32 @@ namespace state {
   typedef struct {
     long previousMillis;
     int brightness;
-    bool history [21];
-    bool done;
+    bool history [22];
     int doneTime;
   } HabitState;
 
   HabitState sweets = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   HabitState murder = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   HabitState brush = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   HabitState sleep = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   HabitState workout = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   HabitState onTime = {
-    0, 255, {false}, false, -1
+    0, 255, {false}, -1
   };
 
   long lastShow = 0;
@@ -207,12 +206,12 @@ namespace buttons {
   }
 
   bool isAnyPressed() {
-    return buttons::isPressed(sweets) || buttons::isPressed(murder) || buttons::isPressed(brush);
+    return buttons::isPressed(sweets) || buttons::isPressed(murder) || buttons::isPressed(brush) || buttons::isPressed(onTime) || buttons::isPressed(sleep) || buttons::isPressed(workout) ;
   }
 };
 
 bool isAnyDone() {
-  return state::sweets.done || state::murder.done || state::brush.done;
+  return state::sweets.history[21] || state::murder.history[21] || state::brush.history[21] || state::onTime.history[21] || state::sleep.history[21] || state::workout.history[21];
 }
 
 void playRandomSound() {
@@ -228,7 +227,7 @@ void playRandomSound() {
 
 void completeHabit(state::HabitState &state, Habit &config) {
   Particle.publish("Habit Done!", String(config.matrixRow));
-  state.done = true;
+  state.history[21] = true;
   state.doneTime = Time.now();
   Color color = config.color;
   //turnOn(sweets.sideLED, 4, strip.Color(sweets.color.r, sweets.color.g, sweets.color.b));
@@ -248,11 +247,11 @@ void completeHabit(state::HabitState &state, Habit &config) {
 }
 bool up = false;
 void checkDone(state::HabitState &state, Habit &config) {
-  if(!state.done && buttons::isPressed(config)) {
+  if(!state.history[21] && buttons::isPressed(config)) {
     completeHabit(state, config);
     state.previousMillis = millis();
 
-  } else if (state.done && millis() - state.previousMillis > 100) {
+  } else if (state.history[21] && millis() - state.previousMillis > 100) {
     if (state.brightness < 255 && up) {
       state.brightness += 1;
       if(state.brightness == 255) {
@@ -278,14 +277,23 @@ void nightLight() {
   if(isAnyDone() && state::lightsOut) {
     if(!state::nightLight && buttons::isAnyPressed()) {
       Particle.publish("ON Lights At Night");
-      if(state::sweets.done) {
+      if(state::sweets.history[21]) {
         lights::todayOn(sweets);
       }
-      if(state::murder.done) {
+      if(state::murder.history[21]) {
         lights::todayOn(murder);
       }
-      if(state::brush.done) {
+      if(state::brush.history[21]) {
         lights::todayOn(brush);
+      }
+      if(state::onTime.history[21]) {
+        lights::todayOn(onTime);
+      }
+      if(state::sleep.history[21]) {
+        lights::todayOn(sleep);
+      }
+      if(state::workout.history[21]) {
+        lights::todayOn(workout);
       }
       lights::show();
       state::lastNightLight = millis();
@@ -295,6 +303,9 @@ void nightLight() {
       lights::todayOff(sweets);
       lights::todayOff(murder);
       lights::todayOff(brush);
+      lights::todayOff(workout);
+      lights::todayOff(onTime);
+      lights::todayOff(sleep);
       lights::show();
       state::nightLight = false;
     }
@@ -306,12 +317,12 @@ void processEndOfDay(state::HabitState &state, Habit &config) {
     state.history[day] = state.history[day+1];
   }
 
-  if(state.done && state.doneTime != -1) {
-    state.done = false;
+  if(state.history[21] && state.doneTime != -1) {
+    state.history[21] = false;
     state.doneTime = -1;
-    state.history[sizeof(state.history) - 1] = true;
+    //state.history[sizeof(state.history) - 2] = true;
   } else {
-    state.history[sizeof(state.history) - 1] = false;
+    //state.history[sizeof(state.history) - 2] = false;
   }
 
   lights::historyOn(state, config);
@@ -376,8 +387,30 @@ void morning() {
 //   }
 // }
 
-void handleHistory(const char *event, const char *data) {
+void handleHistory(const char *event, char *data) {
   // Handle the webhook response
+  StaticJsonBuffer<400> jsonBuffer;
+  //char *json = *data;
+  JsonObject& root = jsonBuffer.parseObject(data);
+
+  if (!root.success())
+  {
+    Particle.publish("parseObject() failed");
+    return;
+  }
+
+  JsonArray& brushTwice = root["brush twice"];
+  bool bt [22];
+  int index = 0;
+  for(JsonArray::iterator it=brushTwice.begin(); it!=brushTwice.end(); ++it) {
+    bool isDone = *it;
+    Particle.publish("test", String(isDone));
+    bt[index] = isDone;
+    index += 1;
+  }
+  *state::brush.history = *bt;
+  lights::historyOn(state::brush, brush);
+
   Particle.publish("result", data);
 }
 

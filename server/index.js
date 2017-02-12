@@ -79,9 +79,9 @@ function makeHistory(rows) {
 
             if(!!found) {
                 console.log("completed", found.habit, found.completeddate)
-                habitsHistory[habit].push(1)
+                habitsHistory[habit].push(true)
             } else {
-                habitsHistory[habit].push(0)
+                habitsHistory[habit].push(false)
             }
         }      
     }
@@ -95,7 +95,7 @@ function makeHistory(rows) {
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return history;
+    return habitsHistory;
 }
 
 app.post('/device/history', function (request, response) {

@@ -2,6 +2,7 @@
 #include "Adafruit_Pixie.h"
 #include "Pushbutton.h"
 #include "neopixel.h"
+#include "SparkJson.h"
 
 int remoteCompleteHabit(String habit);
 void handleHistory(const char *event, const char *data);
