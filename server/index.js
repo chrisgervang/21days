@@ -95,13 +95,11 @@ function makeHistory(rows) {
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return history
+    return history;
 }
 
 app.post('/device/history', function (request, response) {
     if(isAuthenticated(request)) {
-
-
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             client.query(ID_TO_HISTORY, [request.body.coreid], function(err, result) {
                 done();
@@ -109,9 +107,7 @@ app.post('/device/history', function (request, response) {
                     console.error(err);
                     response.send("Error " + err);
                 } else {
-                    response.set('Content-Type', 'text/plain')
-                    response.send(makeHistory(result.rows));
-                    
+                    response.json({history: makeHistory(result.rows)});
                 }
             })
         })
