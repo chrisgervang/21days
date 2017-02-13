@@ -58,7 +58,7 @@ function isAuthenticated(request) {
 }
 
 function makeHistory(rows, timezone) {
-    const TwentyTwoDaysAgo = moment().tz("Etc/UCT").subtract(21, 'days');
+    const TwentyTwoDaysAgo = moment().tz(timezone).subtract(21, 'days');
     var habitsHistory ={
         "brush twice": [],
         "dont murder": [],
@@ -69,13 +69,13 @@ function makeHistory(rows, timezone) {
     }
     console.log(timezone);
     for (var day = 0; day < 22; day++) {
-        var date = moment.tz(TwentyTwoDaysAgo, "Etc/UCT").add(day, 'day');
+        var date = moment.tz(TwentyTwoDaysAgo, timezone).add(day, 'day');
         // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
         var completed = rows.filter((row) => {
             if(row.habit === "dont murder") {
                 //console.log(row.completed, date.toISOString(), moment.tz(row.completed, "Etc/UCT").isSame(date, 'day'))
             }
-            return moment.tz(row.completed, "Etc/UCT").isSame(date, 'day');
+            return moment.tz(row.completed, timezone).isSame(date, 'day');
         });
 
         if(completed.length > 6) console.error("completed length is over 6: " + completed.length)
