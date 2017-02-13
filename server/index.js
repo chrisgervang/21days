@@ -123,9 +123,10 @@ function getTimezone(client, coreid){
 app.post('/device/history', function (request, response) {
     if(isAuthenticated(request)) {
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)]).then(([history, timezone])=> {
+            Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)])
+            .then((results)=> {
                 done();
-                response.send(JSON.stringify(makeHistory(history.rows, timezone.rows[0].timezone)));
+                response.send(JSON.stringify(makeHistory(results[0].rows, results[1].rows[0].timezone)));
             }, (err) => {
                 done();
                 response.send(err);
