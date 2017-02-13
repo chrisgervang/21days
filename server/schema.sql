@@ -15,10 +15,9 @@ CREATE TABLE public.habits
 CREATE TABLE public.habit
 (
     completed timestamp without time zone NOT NULL DEFAULT now(),
-    completedDate date NOT NULL DEFAULT now(),
     user_email text NOT NULL,
     habit text NOT NULL,
-    CONSTRAINT habit_pkey PRIMARY KEY (user_email, habit, completedDate),
+    CONSTRAINT habit_pkey PRIMARY KEY (user_email, habit, completed),
     CONSTRAINT habit_user_email_fkey FOREIGN KEY (user_email)
         REFERENCES public."user" (email) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION,
