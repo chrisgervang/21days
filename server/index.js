@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var pg = require('pg');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
 
 // app.get('/db', function (request, response) {
@@ -55,7 +55,7 @@ function isAuthenticated(request) {
 }
 
 function makeHistory(rows) {
-    const TwentyTwoDaysAgo = moment().startOf('day').subtract(21, 'days');
+    const TwentyTwoDaysAgo = moment().tz("America/Los_Angeles").startOf('day').subtract(21, 'days');
     var habitsHistory ={
         "brush twice": [],
         "dont murder": [],
@@ -65,10 +65,10 @@ function makeHistory(rows) {
         "on time": []
     }
     for (var day = 0; day < 22; day++) {
-        var date = moment(TwentyTwoDaysAgo).add(day, 'day');
+        var date = moment(TwentyTwoDaysAgo, "America/Los_Angeles").add(day, 'day');
         // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
         var completed = rows.filter((row) => {
-            return moment(row.completeddate).isSame(date, 'day');
+            return moment(row.completeddate, "America/Los_Angeles").isSame(date, 'day');
         });
 
         if(completed.length > 6) console.error("completed length is over 6: " + completed.length)
@@ -95,7 +95,7 @@ function makeHistory(rows) {
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return {history: history};
+    return {history: history, order: Object.keys(habitsHistory)};
 }
 
 app.post('/device/history', function (request, response) {

@@ -399,22 +399,22 @@ void handleHistory(const char *event, const char *data) {
   Particle.publish("result", String(send));
   delay(1000);
 
-  char json[length];
-  strcpy(json, data);
+  // char json[length];
+  // strcpy(json, data);
+  //
+  // StaticJsonBuffer<1000> jsonBuffer;
+  //
+  // JsonObject& root = jsonBuffer.parseObject(json);
+  //
+  // if (!root.success())
+  // {
+  //   Particle.publish("parseObject() failed", String(System.freeMemory()));
+  // } else {
+  //   Particle.publish("parseObject() success!", String(System.freeMemory()));
 
-  StaticJsonBuffer<1000> jsonBuffer;
-
-  JsonObject& root = jsonBuffer.parseObject(json);
-
-  if (!root.success())
-  {
-    Particle.publish("parseObject() failed", String(System.freeMemory()));
-  } else {
-    Particle.publish("parseObject() success!", String(System.freeMemory()));
-
-    const char* history = root["history"];
-
-    Particle.publish("HISTORY", String(history));
+    // const char* history = root["history"];
+    //
+    // Particle.publish("HISTORY", String(history));
 
     // JsonArray& order = root["order"];
     // char arr[6];
@@ -429,7 +429,7 @@ void handleHistory(const char *event, const char *data) {
     // lights::historyOn(state::brush, brush);
     // lights::show();
 
-  }
+  // }
 
 
 
