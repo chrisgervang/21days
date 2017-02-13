@@ -92,6 +92,10 @@ namespace state {
   long lastNightLight = 0;
   bool nightLight = false;
   long dayStamp = 0;
+
+  bool intro = false;
+  long lastIntro = 0;
+  int introColumn = 1;
 };
 
 
@@ -153,11 +157,15 @@ namespace lights {
   }
 
   void historyOn(state::HabitState &state, Habit &config) {
-    Color color = config.color;
-    int rgb = strip.Color(color.r, color.g, color.b);
+    Color c = config.color;
+    // int rgb = strip.Color(color.r, color.g, color.b);
     for (unsigned int day = 0; day < sizeof(state.history); day++) {
       if(state.history[day] == 1) {
-        matrix.setPixelColor(map(config.matrixRow, day + 1), rgb);
+        if(day == sizeof(state.history) - 1) {
+          matrix.setColorDimmed(map(config.matrixRow, day + 1), c.r, c.g, c.b, state.brightness);
+        } else {
+          matrix.setColorDimmed(map(config.matrixRow, day + 1), c.r, c.g, c.b, 180);
+        }
       } else {
         matrix.setPixelColor(map(config.matrixRow, day + 1), 0, 0, 0);
       }
@@ -251,24 +259,25 @@ void checkDone(state::HabitState &state, Habit &config) {
     completeHabit(state, config);
     state.previousMillis = millis();
 
-  } else if (state.history[21] && millis() - state.previousMillis > 100) {
-    if (state.brightness < 255 && up) {
-      state.brightness += 1;
-      if(state.brightness == 255) {
-        up = false;
-      }
-    } else if (state.brightness > 0 && !up) {
-      state.brightness -= 1;
-      if(state.brightness == 0) {
-        up = true;
-      }
-    }
-    //Particle.publish("dim", String(state.brightness));
-    matrix.setColorScaled(lights::map(config.matrixRow, 22), config.color.r, config.color.g, config.color.b, state.brightness);
-    state.previousMillis = millis();
-    matrix.show();
-
   }
+  // else if (state.history[21] && millis() - state.previousMillis > 50) {
+  //   if (state.brightness < 255 && up) {
+  //     state.brightness += 1;
+  //     if(state.brightness == 255) {
+  //       up = false;
+  //     }
+  //   } else if (state.brightness > 200 && !up) {
+  //     state.brightness -= 1;
+  //     if(state.brightness == 200) {
+  //       up = true;
+  //     }
+  //   }
+  //   matrix.setColorDimmed(lights::map(config.matrixRow, 22), config.color.r, config.color.g, config.color.b, state.brightness);
+  //   state.previousMillis = millis();
+  //
+  //   matrix.show();
+  //
+  // }
 
 }
 
@@ -598,6 +607,43 @@ void loop() {
   endOfDay();
   nightLight();
   morning();
+
+  if(!state::intro) {
+    if(millis() - state::lastIntro > 1) {
+      for(int row = 1; row < 7; row++) {
+        int col = state::introColumn;
+        if(col < 23) {
+          matrix.setColorDimmed(lights::map(row, 23 - state::introColumn), 255, 255, 255, 200);
+        }
+        if(col > 1 && col < 24) {
+          matrix.setColorDimmed(lights::map(row, 24 - state::introColumn), 255, 255, 255, 100);
+        }
+        if(col > 2 && col < 25) {
+          matrix.setColorDimmed(lights::map(row, 25 - state::introColumn), 255, 255, 255, 50);
+        }
+        if(col > 3 && col < 26) {
+          matrix.setColorDimmed(lights::map(row, 26 - state::introColumn), 255, 255, 255, 0);
+        }
+      }
+
+      if(state::introColumn == 25) {
+        state::intro = true;
+
+        lights::historyOn(state::brush, brush);
+        lights::historyOn(state::murder, murder);
+        lights::historyOn(state::sweets, sweets);
+        lights::historyOn(state::workout, workout);
+        lights::historyOn(state::sleep, sleep);
+        lights::historyOn(state::onTime, onTime);
+
+      } else {
+        state::introColumn += 1;
+      }
+      lights::show();
+      state::lastIntro = millis();
+    }
+
+  }
 
   // if(millis() - state::lastBorder > 2000) {
   //   if(!state::lightsOut) {
