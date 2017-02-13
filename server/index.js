@@ -144,9 +144,17 @@ app.post('/device/history', function (request, response) {
 
 const INSERT_HABIT = 
 `WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $2::text)
-INSERT INTO public.habit (habit, user_email) 
-VALUES ($1::text, (SELECT email FROM owner))`;
+INSERT INTO public.habit (habit, user_email, completedDate) 
+VALUES ($1::text, (SELECT email FROM owner), $3::date)`;
 
+function insertHabit(client, coreid, date){
+    return new Promise(function(resolve,reject){
+        client.query(INSERT_HABIT, [habit, id, date], function(err, result) {
+             if(err !== null) return reject(err);
+             resolve(result);
+         });
+    });
+}
 
 app.post('/device/track', function (request, response) {
     if(isAuthenticated(request)) {
@@ -154,14 +162,18 @@ app.post('/device/track', function (request, response) {
         var id = request.body.coreid;
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            client.query(INSERT_HABIT, [habit, id], function(err, result) {
+            getTimezone(client, id).then((timezone) => {
+                var date = moment().tz(timezone).format("YYYY-MM-DD");
+                insertHabit(client, id, date).then((res) => {
+                    done();
+                    response.send(JSON.stringify(res));
+                }, (err) => {
+                    done();
+                    response.send(err);
+                })
+            }, (err) => {
                 done();
-                if(err) {
-                    console.error(err);
-                    response.send("Error " + err);
-                } else {
-                    response.send("Success " + result);
-                }
+                response.send(err);
             })
         })
     } else {
