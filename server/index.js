@@ -95,7 +95,7 @@ function makeHistory(rows) {
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return history;
+    return {history: history, order: Object.keys(habitsHistory)};
 }
 
 app.post('/device/history', function (request, response) {
@@ -107,7 +107,7 @@ app.post('/device/history', function (request, response) {
                     console.error(err);
                     response.send("Error " + err);
                 } else {
-                    response.send(JSON.stringify({history: makeHistory(result.rows)}));
+                    response.send(JSON.stringify(makeHistory(result.rows)));
                 }
             })
         })

@@ -393,21 +393,18 @@ void handleHistory(const char *event, const char *data) {
 
   char send[length];
   strcpy(send, data);
-  const int buff = JSON_ARRAY_SIZE(22) * 5 + JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(1);
-  delay(1000);
+  const int buff = JSON_ARRAY_SIZE(6) + JSON_OBJECT_SIZE(1);
+
   Particle.publish("Lengths", String(length) + " " + String(strlen(send) + 1) + " " + String(System.freeMemory()) + " " + String(buff));
   Particle.publish("result", String(send));
   delay(1000);
 
-  // char json[length];
-  // strcpy(json, data);
-  char json[] =
-      "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[48.756080,2.302038]}";
+  char json[length];
+  strcpy(json, data);
+
   StaticJsonBuffer<buff> jsonBuffer;
 
-  char json2[] = "{\"history\":{\"brush twice\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],\"dont murder\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"no sweets\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0],\"workout\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],\"sleep by 12am\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]}}";
-
-  JsonObject& root = jsonBuffer.parseObject(json2);
+  JsonObject& root = jsonBuffer.parseObject(json);
 
   if (!root.success())
   {
@@ -415,19 +412,22 @@ void handleHistory(const char *event, const char *data) {
   } else {
     Particle.publish("parseObject() success!", String(System.freeMemory()));
 
-    JsonArray& brushTwice = root["history"]["brush twice"];
-    char arr[1000];
-    brushTwice.printTo(arr, 1000);
-    Particle.publish("BRUSH TWICE", String(arr) + " " + String(brushTwice.size()));
+    const char* history = root["history"];
 
-    for(int index = 0; index < brushTwice.size(); index++) {
-      uint8_t isDone = (uint8_t)brushTwice[index];
-      state::brush.history[index] = isDone;
-    }
-    Particle.publish("bt", String(state::brush.history[0]) + String(state::brush.history[20]));
+    Particle.publish("HISTORY", String(history));
 
-    lights::historyOn(state::brush, brush);
-    lights::show();
+    JsonArray& order = root["order"];
+    char arr[6];
+    order.printTo(arr, buff);
+    Particle.publish("ORDER", String(arr) + " " + String(order.size()));
+    // for(int index = 0; index < brushTwice.size(); index++) {
+    //   uint8_t isDone = (uint8_t)brushTwice[index];
+    //   state::brush.history[index] = isDone;
+    // }
+    // Particle.publish("bt", String(state::brush.history[0]) + String(state::brush.history[20]));
+    //
+    // lights::historyOn(state::brush, brush);
+    // lights::show();
 
   }
 
