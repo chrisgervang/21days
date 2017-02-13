@@ -145,7 +145,7 @@ app.post('/device/history', function (request, response) {
 const INSERT_HABIT = 
 `WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $2::text)
 INSERT INTO public.habit (habit, user_email, completedDate) 
-VALUES ($1::text, (SELECT email FROM owner), $3::date)`;
+VALUES ($1::text, (SELECT email FROM owner), $3)`;
 
 function insertHabit(client, coreid, date){
     return new Promise(function(resolve,reject){
@@ -164,6 +164,7 @@ app.post('/device/track', function (request, response) {
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             getTimezone(client, id).then((timezone) => {
                 var date = moment().tz(timezone).format("YYYY-MM-DD");
+                console.log(date);
                 insertHabit(client, id, date).then((res) => {
                     done();
                     response.send(JSON.stringify(res));
