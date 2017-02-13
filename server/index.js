@@ -58,7 +58,7 @@ function isAuthenticated(request) {
 }
 
 function makeHistory(rows, timezone) {
-    const TwentyTwoDaysAgo = moment().tz("Etc/UCT").startOf('day').subtract(21, 'days');
+    const TwentyTwoDaysAgo = moment().tz("Etc/UCT").subtract(21, 'days');
     var habitsHistory ={
         "brush twice": [],
         "dont murder": [],
@@ -73,7 +73,7 @@ function makeHistory(rows, timezone) {
         // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
         var completed = rows.filter((row) => {
             if(row.habit === "dont murder") {
-                console.log(row.completed, date.toISOString(), moment.tz(row.completed, "Etc/UCT").isSame(date, 'day'))
+                //console.log(row.completed, date.toISOString(), moment.tz(row.completed, "Etc/UCT").isSame(date, 'day'))
             }
             return moment.tz(row.completed, "Etc/UCT").isSame(date, 'day');
         });
