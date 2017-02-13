@@ -393,7 +393,7 @@ void handleHistory(const char *event, const char *data) {
 
   char send[length];
   strcpy(send, data);
-  const int buff = JSON_ARRAY_SIZE(6) + JSON_OBJECT_SIZE(1);
+  const int buff = JSON_ARRAY_SIZE(6) + JSON_OBJECT_SIZE(2) + 238;
 
   Particle.publish("Lengths", String(length) + " " + String(strlen(send) + 1) + " " + String(System.freeMemory()) + " " + String(buff));
   Particle.publish("result", String(send));
@@ -402,7 +402,7 @@ void handleHistory(const char *event, const char *data) {
   char json[length];
   strcpy(json, data);
 
-  StaticJsonBuffer<buff> jsonBuffer;
+  StaticJsonBuffer<1000> jsonBuffer;
 
   JsonObject& root = jsonBuffer.parseObject(json);
 
@@ -416,10 +416,10 @@ void handleHistory(const char *event, const char *data) {
 
     Particle.publish("HISTORY", String(history));
 
-    JsonArray& order = root["order"];
-    char arr[6];
-    order.printTo(arr, buff);
-    Particle.publish("ORDER", String(arr) + " " + String(order.size()));
+    // JsonArray& order = root["order"];
+    // char arr[6];
+    // order.printTo(arr, buff);
+    // Particle.publish("ORDER", String(arr) + " " + String(order.size()));
     // for(int index = 0; index < brushTwice.size(); index++) {
     //   uint8_t isDone = (uint8_t)brushTwice[index];
     //   state::brush.history[index] = isDone;
