@@ -149,7 +149,7 @@ VALUES ($1::text, (SELECT email FROM owner))`;
 
 function insertHabit(client, habit, coreid){
     return new Promise(function(resolve,reject){
-        client.query(INSERT_HABIT, [habit, id], function(err, result) {
+        client.query(INSERT_HABIT, [habit, coreid], function(err, result) {
              if(err !== null) return reject(err);
              resolve(result);
          });
@@ -159,12 +159,12 @@ function insertHabit(client, habit, coreid){
 app.post('/device/track', function (request, response) {
     if(isAuthenticated(request)) {
         var habit = request.body.data;
-        var id = request.body.coreid;
+        var coreid = request.body.coreid;
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)])
+            Promise.all([getHistory(client, coreid), getTimezone(client, coreid)])
             .then((results)=> {
-                var timezone = results[1].rows[0].timezone
+                var timezone = results[1].rows[0].timezone;
                 console.log(timezone);
 
                 var date = moment().tz(timezone);
@@ -184,7 +184,7 @@ app.post('/device/track', function (request, response) {
                     response.send("Already Done For Today");
                 } else {
                     console.log("Inserting. Completed another habit!");
-                    insertHabit(client, habit, id).then((res) => {
+                    insertHabit(client, habit, coreid).then((res) => {
                         done();
                         console.log(res);
                         response.send(JSON.stringify(res));
