@@ -45,9 +45,9 @@ app.get('/habits', function (request, response) {
 
 const ID_TO_HISTORY = 
 `WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $1::text)
-SELECT habit AS habit, completedDate AS completedDate
+SELECT habit AS habit, completed AS completed
 FROM public.habit 
-WHERE user_email = (SELECT email FROM owner) AND completedDate > current_date::date - INTERVAL '22 days'`
+WHERE user_email = (SELECT email FROM owner) AND completed > current_date - INTERVAL '22 days'`
 
 const ID_TO_TIMEZONE = 
 `SELECT profile ->> 'timezone' as timezone FROM public.user WHERE profile ->> 'deviceId' = $1::text`
@@ -58,7 +58,7 @@ function isAuthenticated(request) {
 }
 
 function makeHistory(rows, timezone) {
-    const TwentyTwoDaysAgo = moment().tz(timezone).startOf('day').subtract(21, 'days');
+    const TwentyTwoDaysAgo = moment().tz("Etc/UCT").startOf('day').subtract(21, 'days');
     var habitsHistory ={
         "brush twice": [],
         "dont murder": [],
@@ -67,11 +67,15 @@ function makeHistory(rows, timezone) {
         "sleep by 12am": [],
         "on time": []
     }
+    console.log(timezone);
     for (var day = 0; day < 22; day++) {
-        var date = moment(TwentyTwoDaysAgo, timezone).add(day, 'day');
+        var date = moment.tz(TwentyTwoDaysAgo, "Etc/UCT").add(day, 'day');
         // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
         var completed = rows.filter((row) => {
-            return moment(row.completeddate, timezone).isSame(date, 'day');
+            if(row.habit === "dont murder") {
+                console.log(row.completed, date.toISOString(), moment.tz(row.completed, "Etc/UCT").isSame(date, 'day'))
+            }
+            return moment.tz(row.completed, "Etc/UCT").isSame(date, 'day');
         });
 
         if(completed.length > 6) console.error("completed length is over 6: " + completed.length)
@@ -81,7 +85,7 @@ function makeHistory(rows, timezone) {
             })
 
             if(!!found) {
-                console.log("completed", found.habit, found.completeddate)
+                console.log("completed", found.habit, found.completed)
                 habitsHistory[habit].push(1)
             } else {
                 habitsHistory[habit].push(0)
@@ -125,6 +129,7 @@ app.post('/device/history', function (request, response) {
             Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)])
             .then((results)=> {
                 done();
+                console.log(results[0].rows);
                 response.send(JSON.stringify(makeHistory(results[0].rows, results[1].rows[0].timezone)));
             }, (err) => {
                 done();
