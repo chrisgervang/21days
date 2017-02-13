@@ -144,12 +144,12 @@ app.post('/device/history', function (request, response) {
 
 const INSERT_HABIT = 
 `WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $2::text)
-INSERT INTO public.habit (habit, user_email, completedDate) 
-VALUES ($1::text, (SELECT email FROM owner), $3)`;
+INSERT INTO public.habit (habit, user_email) 
+VALUES ($1::text, (SELECT email FROM owner))`;
 
-function insertHabit(client, coreid, date){
+function insertHabit(client, coreid){
     return new Promise(function(resolve,reject){
-        client.query(INSERT_HABIT, [habit, id, date], function(err, result) {
+        client.query(INSERT_HABIT, [habit, id], function(err, result) {
              if(err !== null) return reject(err);
              resolve(result);
          });
@@ -162,21 +162,43 @@ app.post('/device/track', function (request, response) {
         var id = request.body.coreid;
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-            getTimezone(client, id).then((timezone) => {
-                var date = moment().tz(timezone).format("YYYY-MM-DD");
-                console.log(date);
-                insertHabit(client, id, date).then((res) => {
+            Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)])
+            .then((results)=> {
+                var timezone = results[1].rows[0].timezone
+                console.log(timezone);
+
+                var date = moment().tz(timezone);
+                //, moment().tz('Etc/UTC').format("YYYY-MM-DD")
+                console.log(date.format());
+                
+                var doneForDay = results[0].rows.some((row) => {
+                    console.log(row, habit);
+                    if(row.habit === habit) {
+                        console.log(moment.tz(row.completed, timezone).format())
+                    }
+                    return row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day');
+                });
+
+                if(doneForDay) {
                     done();
-                    response.send(JSON.stringify(res));
-                }, (err) => {
-                    done();
-                    response.send(err);
-                })
+                    response.send("Already Done For Today");
+                } else {
+                    console.log("Inserting. Completed another habit!");
+                    insertHabit(client, id).then((res) => {
+                        done();
+                        console.log(res);
+                        response.send(JSON.stringify(res));
+                    }, (err) => {
+                        done();
+                        response.send(err);
+                    });
+                }
+                
             }, (err) => {
                 done();
                 response.send(err);
-            })
-        })
+            });
+        });
     } else {
         console.error("Auth did not match");
         response.send("Error Auth did not match");
