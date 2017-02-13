@@ -145,8 +145,8 @@ VALUES ($1::text, (SELECT email FROM owner))`;
 
 app.post('/device/track', function (request, response) {
     if(isAuthenticated(request)) {
-        var habit = request.headers.data;
-        var id = request.headers.coreid;
+        var habit = request.body.data;
+        var id = request.body.coreid;
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             client.query(INSERT_HABIT, [habit, id], function(err, result) {
