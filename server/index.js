@@ -3,7 +3,6 @@ var app = express();
 var pg = require('pg');
 var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
-var Promise = require("es6-promise").Promise;
 
 // app.get('/db', function (request, response) {
 //   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
