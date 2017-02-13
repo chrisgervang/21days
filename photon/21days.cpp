@@ -57,32 +57,32 @@ namespace state {
   typedef struct {
     long previousMillis;
     int brightness;
-    bool history [22];
+    uint8_t history [22];
     int doneTime;
   } HabitState;
 
   HabitState sweets = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   HabitState murder = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   HabitState brush = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   HabitState sleep = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   HabitState workout = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   HabitState onTime = {
-    0, 255, {false}, -1
+    0, 255, {0}, -1
   };
 
   long lastShow = 0;
@@ -156,7 +156,7 @@ namespace lights {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
     for (unsigned int day = 0; day < sizeof(state.history); day++) {
-      if(state.history[day]) {
+      if(state.history[day] == 1) {
         matrix.setPixelColor(map(config.matrixRow, day + 1), rgb);
       } else {
         matrix.setPixelColor(map(config.matrixRow, day + 1), 0, 0, 0);
@@ -389,31 +389,50 @@ void morning() {
 
 void handleHistory(const char *event, const char *data) {
   // Handle the webhook response
-  StaticJsonBuffer<1000> jsonBuffer;
   int length = strlen(data) + 1;
-  char json[length];
-  strcpy(json, data);
 
-  JsonObject& root = jsonBuffer.parseObject(json);
+  char send[length];
+  strcpy(send, data);
+  const int buff = JSON_ARRAY_SIZE(22) * 5 + JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(1);
+  delay(1000);
+  Particle.publish("Lengths", String(length) + " " + String(strlen(send) + 1) + " " + String(System.freeMemory()) + " " + String(buff));
+  Particle.publish("result", String(send));
+  delay(1000);
+
+  // char json[length];
+  // strcpy(json, data);
+  char json[] =
+      "{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[48.756080,2.302038]}";
+  StaticJsonBuffer<buff> jsonBuffer;
+
+  char json2[] = "{\"history\":{\"brush twice\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],\"dont murder\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"no sweets\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0],\"workout\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],\"sleep by 12am\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]}}";
+
+  JsonObject& root = jsonBuffer.parseObject(json2);
 
   if (!root.success())
   {
-    Particle.publish("parseObject() failed");
+    Particle.publish("parseObject() failed", String(System.freeMemory()));
+  } else {
+    Particle.publish("parseObject() success!", String(System.freeMemory()));
+
+    JsonArray& brushTwice = root["history"]["brush twice"];
+    char arr[1000];
+    brushTwice.printTo(arr, 1000);
+    Particle.publish("BRUSH TWICE", String(arr) + " " + String(brushTwice.size()));
+
+    for(int index = 0; index < brushTwice.size(); index++) {
+      uint8_t isDone = (uint8_t)brushTwice[index];
+      state::brush.history[index] = isDone;
+    }
+    Particle.publish("bt", String(state::brush.history[0]) + String(state::brush.history[20]));
+
+    lights::historyOn(state::brush, brush);
+    lights::show();
+
   }
 
-  JsonArray& brushTwice = root["history"]["brush twice"];
-  bool bt [22];
-  int index = 0;
-  for(JsonArray::iterator it=brushTwice.begin(); it!=brushTwice.end(); ++it) {
-    bool isDone = *it;
-    Particle.publish("test", String(isDone));
-    bt[index] = isDone;
-    index += 1;
-  }
-  *state::brush.history = *bt;
-  lights::historyOn(state::brush, brush);
 
-  Particle.publish("result", json);
+
 }
 
 void setup() {

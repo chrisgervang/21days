@@ -95,7 +95,7 @@ function makeHistory(rows) {
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return habitsHistory;
+    return history;
 }
 
 app.post('/device/history', function (request, response) {
