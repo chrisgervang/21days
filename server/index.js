@@ -147,7 +147,7 @@ const INSERT_HABIT =
 INSERT INTO public.habit (habit, user_email) 
 VALUES ($1::text, (SELECT email FROM owner))`;
 
-function insertHabit(client, coreid){
+function insertHabit(client, habit, coreid){
     return new Promise(function(resolve,reject){
         client.query(INSERT_HABIT, [habit, id], function(err, result) {
              if(err !== null) return reject(err);
@@ -184,7 +184,7 @@ app.post('/device/track', function (request, response) {
                     response.send("Already Done For Today");
                 } else {
                     console.log("Inserting. Completed another habit!");
-                    insertHabit(client, id).then((res) => {
+                    insertHabit(client, habit, id).then((res) => {
                         done();
                         console.log(res);
                         response.send(JSON.stringify(res));
