@@ -3,6 +3,7 @@ var app = express();
 var pg = require('pg');
 var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
+var rp = require('request-promise-native');
 
 // app.get('/db', function (request, response) {
 //   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
@@ -15,6 +16,10 @@ var bodyParser = require('body-parser');
 //     });
 //   });
 // });
+
+function completeHabit(habit, coreid, accessToken) {
+  return rp(`https://api.particle.io/v1/devices/${coreid}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${accessToken}`})
+}
 
 const habits = ["brush twice", "dont murder", "no sweets", "workout", "sleep by 12am", "on time"]
 
@@ -43,85 +48,12 @@ app.get('/habits', function (request, response) {
     }
 })
 
-const ID_TO_HISTORY = 
-`WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $1::text)
-SELECT habit AS habit, completed AS completed
-FROM public.habit 
-WHERE user_email = (SELECT email FROM owner) AND completed > current_date - INTERVAL '22 days'`
-
-const ID_TO_TIMEZONE = 
-`SELECT profile ->> 'timezone' as timezone FROM public.user WHERE profile ->> 'deviceId' = $1::text`
-
 function isAuthenticated(request) {
     var key = process.env.API_KEY;
     return key === request.body.api_key
 }
 
-function makeHistory(rows, timezone) {
-    const TwentyTwoDaysAgo = moment().tz(timezone).subtract(21, 'days');
-    var habitsHistory ={
-        "brush twice": [],
-        "dont murder": [],
-        "no sweets": [],
-        "workout": [],
-        "sleep by 12am": [],
-        "on time": []
-    }
-    console.log(timezone);
-    for (var day = 0; day < 22; day++) {
-        var date = moment.tz(TwentyTwoDaysAgo, timezone).add(day, 'day');
-        // Max length 6. PK guarentees only one of each type of habit comopleted on any day.
-        var completed = rows.filter((row) => {
-            if(row.habit === "dont murder") {
-                //console.log(row.completed, date.toISOString(), moment.tz(row.completed, "Etc/UCT").isSame(date, 'day'))
-            }
-            return moment.tz(row.completed, timezone).isSame(date, 'day');
-        });
 
-        if(completed.length > 6) console.error("completed length is over 6: " + completed.length)
-        for(var habit in habitsHistory) {
-            var found = completed.find((val) => {
-                return val.habit === habit
-            })
-
-            if(!!found) {
-                console.log("completed", found.habit, found.completed)
-                habitsHistory[habit].push(1)
-            } else {
-                habitsHistory[habit].push(0)
-            }
-        }      
-    }
-    console.log(JSON.stringify(habitsHistory))
-
-    var history = "";
-    Object.keys(habitsHistory).forEach(function(habit, index, keys){
-        const historyOfHabit = habitsHistory[habit].reduce((prev, curr) => {
-            return prev += String(curr)
-        }, "")
-        console.log(historyOfHabit)
-        history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
-    })
-    return {history: history, order: Object.keys(habitsHistory)};
-}
-
-function getHistory(client, coreid){
-    return new Promise(function(resolve,reject){
-        client.query(ID_TO_HISTORY, [coreid], function(err, result) {
-             if(err !== null) return reject(err);
-             resolve(result);
-         });
-    });
-}
-
-function getTimezone(client, coreid){
-    return new Promise(function(resolve,reject){
-        client.query(ID_TO_TIMEZONE, [coreid], function(err, result) {
-             if(err !== null) return reject(err);
-             resolve(result);
-         });
-    });
-}
 
 app.post('/device/history', function (request, response) {
     if(isAuthenticated(request)) {
@@ -140,21 +72,7 @@ app.post('/device/history', function (request, response) {
         console.error("Auth no good");
         response.send("Error: Auth no good");
     }
-})
-
-const INSERT_HABIT = 
-`WITH owner AS (SELECT email AS email FROM public.user WHERE profile ->> 'deviceId' = $2::text)
-INSERT INTO public.habit (habit, user_email) 
-VALUES ($1::text, (SELECT email FROM owner))`;
-
-function insertHabit(client, habit, coreid){
-    return new Promise(function(resolve,reject){
-        client.query(INSERT_HABIT, [habit, coreid], function(err, result) {
-             if(err !== null) return reject(err);
-             resolve(result);
-         });
-    });
-}
+});
 
 app.post('/device/track', function (request, response) {
     if(isAuthenticated(request)) {
@@ -167,26 +85,17 @@ app.post('/device/track', function (request, response) {
                 var timezone = results[1].rows[0].timezone;
                 console.log(timezone);
 
-                var date = moment().tz(timezone);
-                //, moment().tz('Etc/UTC').format("YYYY-MM-DD")
-                console.log(date.format());
-                
-                var doneForDay = results[0].rows.some((row) => {
-                    console.log(row, habit);
-                    if(row.habit === habit) {
-                        console.log(moment.tz(row.completed, timezone).format())
-                    }
-                    return row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day');
-                });
+                const doneForDay = isDoneForDay(results[0].rows, timezone);
 
                 if(doneForDay) {
                     done();
                     response.send("Already Done For Today");
                 } else {
                     console.log("Inserting. Completed another habit!");
-                    insertHabit(client, habit, coreid).then((res) => {
+                    Promise.all([insertHabit(client, habit, coreid), completeHabit(habit, coreid, "7bc0a91537202df9bc55760e960fa05b6f84163c")]).then((res) => {
                         done();
                         console.log(res);
+                        
                         response.send(JSON.stringify(res));
                     }, (err) => {
                         done();

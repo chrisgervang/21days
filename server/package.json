@@ -15,7 +15,9 @@
     "express": "4.13.3",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.11",
-    "pg": "4.x"
+    "pg": "4.x",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.3"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 CREATE TABLE public.user
 (
     email text NOT NULL,
-    created timestamp without time zone NOT NULL DEFAULT now(),
+    created timestamp with time zone NOT NULL DEFAULT now(),
     profile json NOT NULL default '{}'::json,
     PRIMARY KEY (email)
 )

@@ -536,19 +536,19 @@ void randomHistory() {
 
 
 int remoteCompleteHabit(String habit) {
-  if(habit == "sweets") {
+  if(habit == "no sweets") {
     completeHabit(state::sweets, sweets);
     return 1;
-  } else if (habit == "murder") {
+  } else if (habit == "dont murder") {
     completeHabit(state::murder, murder);
     return 1;
-  } else if ( habit == "brush") {
+  } else if ( habit == "brush twice") {
     completeHabit(state::brush, brush);
     return 1;
-  } else if (habit == "sleep") {
+  } else if (habit == "sleep by 12am") {
     completeHabit(state::sleep, sleep);
     return 1;
-  } else if (habit == "onTime") {
+  } else if (habit == "on time") {
     completeHabit(state::onTime, onTime);
     return 1;
   } else if( habit == "workout") {
