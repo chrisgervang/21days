@@ -1,4 +1,7 @@
-export function makeHistory(rows, timezone) {
+import * as moment from 'moment-timezone';
+import {History} from './commands';
+
+export function makeHistory(rows: History[], timezone: string) {
     const TwentyTwoDaysAgo = moment().tz(timezone).subtract(21, 'days');
     var habitsHistory ={
         "brush twice": [],
@@ -46,7 +49,8 @@ export function makeHistory(rows, timezone) {
 }
 
 
-export function isDoneForDay(history, timezone) {
+
+export function isDoneForDay(history: History[], timezone: string, habit: string) {
     var date = moment().tz(timezone);
     //, moment().tz('Etc/UTC').format("YYYY-MM-DD")
     console.log(date.format());

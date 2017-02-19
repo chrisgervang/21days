@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        // "noImplicitAny": true,
+        "jsx": "react",
+        "outDir": "./static/bin/",
+        "sourceMap": true
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts",
+        "!./static/**/*.ts"
+    ],
+    "files": [
+        "./index.ts"
+    ]
+}

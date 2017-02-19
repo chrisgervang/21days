@@ -1,21 +1,10 @@
-var express = require('express');
+import * as express from 'express';
 var app = express();
-var pg = require('pg');
-var moment = require('moment-timezone');
-var bodyParser = require('body-parser');
-var rp = require('request-promise-native');
-
-// app.get('/db', function (request, response) {
-//   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-//     client.query('SELECT * FROM test_table', function(err, result) {
-//       done();
-//       if (err)
-//        { console.error(err); response.send("Error " + err); }
-//       else
-//        { response.json({results: result.rows} ); }
-//     });
-//   });
-// });
+import * as pg from 'pg';
+import * as bodyParser from 'body-parser';
+import * as rp from 'request-promise-native';
+import {getHistory, getTimezone, insertHabit} from './commands';
+import {makeHistory, isDoneForDay} from './factory';
 
 function completeHabit(habit, coreid, accessToken) {
   return rp(`https://api.particle.io/v1/devices/${coreid}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${accessToken}`})
@@ -59,10 +48,10 @@ app.post('/device/history', function (request, response) {
     if(isAuthenticated(request)) {
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             Promise.all([getHistory(client, request.body.coreid), getTimezone(client, request.body.coreid)])
-            .then((results)=> {
+            .then(([history, timezone])=> {
                 done();
-                console.log(results[0].rows);
-                response.send(JSON.stringify(makeHistory(results[0].rows, results[1].rows[0].timezone)));
+                console.log(history);
+                response.send(JSON.stringify(makeHistory(history, timezone)));
             }, (err) => {
                 done();
                 response.send(err);
@@ -81,11 +70,10 @@ app.post('/device/track', function (request, response) {
 
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             Promise.all([getHistory(client, coreid), getTimezone(client, coreid)])
-            .then((results)=> {
-                var timezone = results[1].rows[0].timezone;
+            .then(([history, timezone])=> {
                 console.log(timezone);
 
-                const doneForDay = isDoneForDay(results[0].rows, timezone);
+                const doneForDay = isDoneForDay(history, timezone, habit);
 
                 if(doneForDay) {
                     done();
@@ -118,10 +106,6 @@ app.post('/device/track', function (request, response) {
 app.set('port', (process.env.PORT || 5000));
 
 // app.use(express.static(__dirname + '/public'));
-
-// views is directory for all template files
-// app.set('views', __dirname + '/views');
-// app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
   response.send('pages/index');
