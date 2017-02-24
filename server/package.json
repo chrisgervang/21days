@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/ts-node index.ts",
-    "test": "./node_modules/.bin/mocha --compilers ts:ts-node/register,tsx:ts-node/register"
+    "test": "./node_modules/.bin/mocha ./tests/**/*.ts --compilers ts:ts-node/register,tsx:ts-node/register"
   },
   "dependencies": {
     "babel": "^6.5.2",
@@ -29,5 +29,11 @@
     "heroku",
     "express"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^3.4.35",
+    "@types/mocha": "^2.2.39",
+    "@types/moment-timezone": "^0.2.34",
+    "chai": "^3.5.0"
+  }
 }

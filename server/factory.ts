@@ -50,15 +50,15 @@ export function makeHistory(rows: History[], timezone: string) {
 
 
 
-export function isDoneForDay(history: History[], timezone: string, habit: string) {
-    var date = moment().tz(timezone);
+export function isDoneForDay(history: History[], referenceDate: string, timezone: string, habit: string) {
+    var date = moment(referenceDate).tz(timezone);
     //, moment().tz('Etc/UTC').format("YYYY-MM-DD")
     console.log(date.format());
     
     var doneForDay = history.some((row) => {
-        console.log(row, habit);
-        if(row.habit === habit) {
-            console.log(moment.tz(row.completed, timezone).format())
+        if(row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day')) {
+            console.log(row, habit);
+            console.log(moment.tz(row.completed, timezone).format(), moment.tz(row.completed, timezone).isSame(date, 'day'))
         }
         return row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day');
     });

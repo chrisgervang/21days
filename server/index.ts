@@ -71,7 +71,7 @@ app.post('/device/track', function (request, response) {
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {
             Promise.all([getHistory(client, coreid), getTimezone(client, coreid)])
             .then(([history, timezone])=> {
-                console.log(timezone);
+                console.log(timezone, history);
 
                 const doneForDay = isDoneForDay(history, timezone, habit);
 
