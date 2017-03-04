@@ -36,6 +36,7 @@
     "@types/chai": "^3.4.35",
     "@types/mocha": "^2.2.39",
     "@types/moment-timezone": "^0.2.34",
+    "@types/node": "^7.0.5",
     "chai": "^3.5.0"
   }
 }
