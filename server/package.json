@@ -11,6 +11,12 @@
     "test": "./node_modules/.bin/mocha ./tests/**/*.ts --compilers ts:ts-node/register,tsx:ts-node/register"
   },
   "dependencies": {
+    "@types/body-parser": "0.0.34",
+    "@types/chai": "^3.4.35",
+    "@types/mocha": "^2.2.39",
+    "@types/moment-timezone": "^0.2.34",
+    "@types/node": "^7.0.5",
+    "chai": "^3.5.0",
     "babel": "^6.5.2",
     "body-parser": "^1.16.1",
     "express": "4.13.3",
@@ -33,10 +39,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^3.4.35",
-    "@types/mocha": "^2.2.39",
-    "@types/moment-timezone": "^0.2.34",
-    "@types/node": "^7.0.5",
-    "chai": "^3.5.0"
+    
   }
 }
