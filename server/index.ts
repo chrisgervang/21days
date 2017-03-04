@@ -5,10 +5,15 @@ import * as bodyParser from 'body-parser';
 import * as rp from 'request-promise-native';
 import {getHistory, getTimezone, insertHabit} from './commands';
 import {makeHistory, isDoneForDay} from './factory';
+import * as moment from 'moment-timezone';
 
-
-function completeHabit(habit, coreid, accessToken) {
-  return rp(`https://api.particle.io/v1/devices/${coreid}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${accessToken}`})
+function completeHabit(habit:string, coreid: string, accessToken: string) {
+  return rp(`https://api.particle.io/v1/devices/${coreid}/habit`, 
+    {
+        method: 'POST', 
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }, 
+        body: `args=${habit}&access_token=${accessToken}`
+    })
 }
 
 const habits = ["brush twice", "dont murder", "no sweets", "workout", "sleep by 12am", "on time"]
@@ -74,14 +79,14 @@ app.post('/device/track', function (request, response) {
             .then(([history, timezone])=> {
                 console.log(timezone, history);
 
-                const doneForDay = isDoneForDay(history, new Date().toUTCString(), timezone, habit);
+                const doneForDay = isDoneForDay(history, moment().utc().format(), timezone, habit);
 
                 if(doneForDay) {
                     done();
                     response.send("Already Done For Today");
                 } else {
                     console.log("Inserting. Completed another habit!");
-                    Promise.all([insertHabit(client, habit, coreid), completeHabit(habit, coreid, "7bc0a91537202df9bc55760e960fa05b6f84163c")]).then((res) => {
+                    Promise.all([insertHabit(client, habit, coreid), completeHabit(habit, coreid, process.env.ACCESS_TOKEN)]).then((res) => {
                         done();
                         console.log(res);
                         
