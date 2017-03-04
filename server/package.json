@@ -19,7 +19,8 @@
     "pg": "4.x",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3",
-    "ts-node": "^2.1.0"
+    "ts-node": "^2.1.0",
+    "typescript": "^2.2.1"
   },
   "repository": {
     "type": "git",
