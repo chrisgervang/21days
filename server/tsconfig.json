@@ -13,6 +13,6 @@
         "!./static/**/*.ts"
     ],
     "files": [
-        "./index.ts"
+        "./server.ts"
     ]
 }

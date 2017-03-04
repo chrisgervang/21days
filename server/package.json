@@ -7,7 +7,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/ts-node index.ts",
+    "start": "node index.js",
     "test": "./node_modules/.bin/mocha ./tests/**/*.ts --compilers ts:ts-node/register,tsx:ts-node/register"
   },
   "dependencies": {
