@@ -20,8 +20,8 @@ Habit sweets = {
 Habit workout = {
   Pushbutton(D2, false, 0),
   1,
-  3,
-  {255, 255, 0}
+  2,
+  {255, 127, 0}
 };
 
 Habit sleep = {
@@ -41,8 +41,8 @@ Habit murder = {
 Habit onTime = {
   Pushbutton(D5, false, 0),
   4,
-  2,
-  {255, 158, 0}
+  3,
+  {255, 255, 0}
 };
 
 Habit brush = {

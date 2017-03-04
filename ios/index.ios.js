@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { access_token, device_id } from './token';
+import { api_key, device_id } from './token';
 import {
   AppRegistry,
   StyleSheet,
@@ -12,35 +12,34 @@ import {
 } from 'react-native';
 
 export default class test extends Component {
-    _onPressButtonBrush() {
+    handlePressButtonBrush() {
       console.log("BRUSH")
-      completeHabit('brush')
-      testLog();
+      completeHabit('brush twice')
     }
 
-    _onPressButtonTime() {
+    handlePressButtonTime() {
       console.log("TIME")
-     completeHabit('onTime')
+     completeHabit('on time')
     }
 
-    _onPressButtonMurder() {
+    handlePressButtonMurder() {
       console.log("MURDER")
-      completeHabit('murder')
+      completeHabit('dont murder')
     }
 
-    _onPressButtonSleep() {
+    handlePressButtonSleep() {
       console.log("SLEEP")
-      completeHabit('sleep')
+      completeHabit('sleep by 12am')
     }
 
-    _onPressButtonWorkout() {
+    handlePressButtonWorkout() {
       console.log("WORKOUT")
       completeHabit('workout')
     }
 
-    _onPressButtonSweets() {
+    handlePressButtonSweets() {
       console.log("SWEETS")
-      completeHabit('sweets')
+      completeHabit('no sweets')
     }
 
 
@@ -60,24 +59,24 @@ export default class test extends Component {
         />
         <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <TouchableHighlight onPress={this._onPressButtonBrush}>
+                <TouchableHighlight onPress={this.handlePressButtonBrush}>
                   <Image style={styles.image} source={require('./img/brush.jpg')} />
                 </TouchableHighlight>
-                <TouchableHighlight onPress={this._onPressButtonTime}>
+                <TouchableHighlight onPress={this.handlePressButtonTime}>
                   <Image style={styles.image} source={require('./img/onTime.jpg')}/>
                 </TouchableHighlight>
-                <TouchableHighlight onPress={this._onPressButtonMurder}>
+                <TouchableHighlight onPress={this.handlePressButtonMurder}>
                   <Image style={styles.image} source={require('./img/murder.jpg')}/>
                 </TouchableHighlight>
             </View>
             <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <TouchableHighlight onPress={this._onPressButtonSleep}>
+                <TouchableHighlight onPress={this.handlePressButtonSleep}>
                   <Image style={styles.image} source={require('./img/sleep.jpg')}/>
                 </TouchableHighlight>
-                <TouchableHighlight onPress={this._onPressButtonWorkout}>
+                <TouchableHighlight onPress={this.handlePressButtonWorkout}>
                   <Image style={styles.image} source={require('./img/workout.jpg')}/>
                 </TouchableHighlight>
-                <TouchableHighlight onPress={this._onPressButtonSweets}>
+                <TouchableHighlight onPress={this.handlePressButtonSweets}>
                   <Image style={styles.image} source={require('./img/sweets.jpg')}/>
                 </TouchableHighlight>
             </View>
@@ -87,10 +86,22 @@ export default class test extends Component {
   }
 }
 
+
+
 AppRegistry.registerComponent('ios', () => test);
 
 function completeHabit(habit) {
-  fetch(`https://api.particle.io/v1/devices/${device_id}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${access_token}`})
+  fetch(`https://server-21days.herokuapp.com/device/track`, 
+    {
+      method: 'POST', 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({
+        "api_key": api_key,
+        "coreid": device_id,
+        "data": habit
+      })
+    }
+  )
 }
 
 function testLog() {

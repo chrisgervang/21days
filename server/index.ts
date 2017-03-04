@@ -6,6 +6,7 @@ import * as rp from 'request-promise-native';
 import {getHistory, getTimezone, insertHabit} from './commands';
 import {makeHistory, isDoneForDay} from './factory';
 
+
 function completeHabit(habit, coreid, accessToken) {
   return rp(`https://api.particle.io/v1/devices/${coreid}/habit`, {method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `args=${habit}&access_token=${accessToken}`})
 }
@@ -73,7 +74,7 @@ app.post('/device/track', function (request, response) {
             .then(([history, timezone])=> {
                 console.log(timezone, history);
 
-                const doneForDay = isDoneForDay(history, timezone, habit);
+                const doneForDay = isDoneForDay(history, new Date().toUTCString(), timezone, habit);
 
                 if(doneForDay) {
                     done();
