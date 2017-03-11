@@ -203,7 +203,7 @@ class Button extends Component {
   }
 }
 
-AppRegistry.registerComponent('ios', () => test);
+AppRegistry.registerComponent('days', () => test);
 
 function completeHabit(habit) {
   return fetch(`https://server-21days.herokuapp.com/device/track`, 
