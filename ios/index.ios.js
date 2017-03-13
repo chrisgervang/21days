@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import { api_key, device_id } from './token';
+import {Button} from './src/Button'
+
 import {
   AppRegistry,
   StyleSheet,
-  Text,
-  TouchableHighlight,
   View, 
-  Image,
   Dimensions,
   StatusBar,
-  LayoutAnimation
+  ScrollView,
+  Text,
+  DatePickerIOS
 } from 'react-native';
 
 function parseText(response) {
@@ -17,6 +18,30 @@ function parseText(response) {
 }
 
 export default class test extends Component {
+  scrollView;
+  componentDidMount() {
+    console.log("Scroll!", !!this.scrollView.scrollTo)
+    this.scrollView.scrollTo({x: 0, y: 0, animated: false})
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1, backgroundColor: 'black'}}>
+        <StatusBar
+          barStyle='light-content'
+        />
+        <ScrollView ref={elt => { console.log("View!", !!elt); this.scrollView = elt;}} indicatorStyle={"white"} contentContainerStyle={{flexDirection: "row"}} snapToAlignment={"center"} horizontal={true} pagingEnabled={true} >
+          <Day key={2} date={"Thursday"}/>
+          <Day key={1} date={"Yesterday"}/>
+          <Day key={0} date={"Today"}/>
+        </ScrollView>
+        
+      </View>
+    )
+  }
+}
+
+class Day extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -113,95 +138,39 @@ export default class test extends Component {
     this.setState({noSweets: true});
   }
 
-
   render() {
-    
     return (
-      <View style={{flex: 1, backgroundColor: 'black'}}>
-        <StatusBar
-          barStyle='light-content'
-        />
+      <View style={{paddingLeft: 10, paddingRight: 10}}>
         <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <Button onPress={this.handlePressButtonBrush} img={require('./img/brush.jpg')} pressed={this.state.brush}
-                  backgroundColor="#8A7EA8" activeColor="rgb(144, 0, 255)"/>
-                <Button onPress={this.handlePressButtonTime} img={require('./img/onTime.jpg')} pressed={this.state.onTime}
-                  backgroundColor="#E5CBA8" /*FFDEB3*/ activeColor="rgb(255, 255, 0)"/>
-                <Button onPress={this.handlePressButtonMurder} img={require('./img/murder.jpg')} pressed={this.state.dontMurder}
-                  backgroundColor="#0E1019" activeColor="rgb(255, 0, 25)"/>
-            </View>
-            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <Button onPress={this.handlePressButtonSleep} img={require('./img/sleep.jpg')} pressed={this.state.sleep}
-                  backgroundColor=/*"#17344C"*/ "#081119" activeColor="rgb(0, 158, 255)"/>
-                <Button onPress={this.handlePressButtonWorkout} img={require('./img/workout.jpg')} pressed={this.state.workout}
-                  backgroundColor="#325866" activeColor="rgb(255, 127, 0)"/>
-                <Button onPress={this.handlePressButtonSweets} img={require('./img/sweets.jpg')} pressed={this.state.noSweets}
-                  backgroundColor="#74A574" activeColor="rgb(0, 255, 0)"/>
-            </View>
+          <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+              <Button onPress={this.handlePressButtonBrush} img={require('./img/brush.jpg')} pressed={this.state.brush}
+                backgroundColor="#8A7EA8" activeColor="rgb(144, 0, 255)"/>
+              <Button onPress={this.handlePressButtonTime} img={require('./img/onTime.jpg')} pressed={this.state.onTime}
+                backgroundColor="#E5CBA8" /*FFDEB3*/ activeColor="rgb(255, 255, 0)"/>
+              <Button onPress={this.handlePressButtonMurder} img={require('./img/murder.jpg')} pressed={this.state.dontMurder}
+                backgroundColor="#0E1019" activeColor="rgb(255, 0, 25)"/>
+          </View>
+          <View style={{paddingLeft: 20, flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+              <Button onPress={this.handlePressButtonSleep} img={require('./img/sleep.jpg')} pressed={this.state.sleep}
+                backgroundColor=/*"#17344C"*/ "#081119" activeColor="rgb(0, 158, 255)"/>
+              <Button onPress={this.handlePressButtonWorkout} img={require('./img/workout.jpg')} pressed={this.state.workout}
+                backgroundColor="#325866" activeColor="rgb(255, 127, 0)"/>
+              <Button onPress={this.handlePressButtonSweets} img={require('./img/sweets.jpg')} pressed={this.state.noSweets}
+                backgroundColor="#74A574" activeColor="rgb(0, 255, 0)"/>
+          </View>
+        </View>
+        <View style={{alignItems: "center"}}>
+          <DatePickerIOS date={new Date()} onDateChange={console.log}/>
+          <Text style={{color: "white"}}>
+            {this.props.date}
+          </Text>
         </View>
       </View>
-    );
-  }
-}
-
-class Button extends Component {
-  componentWillMount() {
-    LayoutAnimation.spring();
-  }
-
-  render() {
-    var deviceWidth = Dimensions.get('window').width;
-    const {onPress, img, pressed, backgroundColor, activeColor} = this.props;
-
-    const styles = {
-      image: {
-        resizeMode: 'contain',
-        width: /*pressed ? deviceWidth / 2 - 30 : deviceWidth / 2 - 20*/ deviceWidth / 2 - 20,
-        height: /*pressed ? deviceWidth / 2 - 30 : deviceWidth / 2 - 20*/ deviceWidth / 2 - 20,
-        borderRadius: 5,
-        zIndex: 10
-      },
-      button: {
-        marginBottom: 10,
-        flexDirection: "column",
-        alignItems: "center"
-      },
-      shadow: {
-        height: pressed ? 15 : 20,
-        width: /*pressed ? deviceWidth / 2 - 30 : deviceWidth / 2 - 20*/ deviceWidth / 2 - 20,
-        marginTop: -5,
-        backgroundColor: backgroundColor,
-        borderBottomRightRadius: /*pressed ? 2 : 5*/ 5,
-        borderBottomLeftRadius: /*pressed ? 2 : 5*/ 5,
-        zIndex: 5,
-      },
-      outline: {
-        width: deviceWidth / 2 - 10, 
-        height: deviceWidth / 2 - 20,
-        marginTop: -(deviceWidth / 2 - 25),
-        marginLeft: 0,
-        backgroundColor: pressed ? activeColor : "#333",
-        zIndex: 1,
-        borderRadius: 5
-      },
-      container: {
-        width: deviceWidth / 2 - 20, 
-        height: deviceWidth / 2, 
-        justifyContent: "flex-end",
-        alignItems: "center"
-      }
-    }
-    return (
-      <TouchableHighlight onPress={onPress} style={styles.button}>
-        <View style={styles.container}>
-          <Image style={styles.image} source={img}/>
-          <View style={styles.shadow}/>
-          <View style={styles.outline}/>
-        </View>
-      </TouchableHighlight>
     )
   }
 }
+
+
 
 AppRegistry.registerComponent('days', () => test);
 
