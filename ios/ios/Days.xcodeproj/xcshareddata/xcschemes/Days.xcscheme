@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "days.temp_caseinsensitive_rename.app"
+               BuildableName = "Days.app"
                BlueprintName = "days"
-               ReferencedContainer = "container:days.xcodeproj">
+               ReferencedContainer = "container:Days.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -45,7 +45,7 @@
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "daysTests.xctest"
                BlueprintName = "daysTests"
-               ReferencedContainer = "container:days.xcodeproj">
+               ReferencedContainer = "container:Days.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -63,7 +63,7 @@
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "daysTests.xctest"
                BlueprintName = "daysTests"
-               ReferencedContainer = "container:days.xcodeproj">
+               ReferencedContainer = "container:Days.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -71,9 +71,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "days.temp_caseinsensitive_rename.app"
+            BuildableName = "Days.app"
             BlueprintName = "days"
-            ReferencedContainer = "container:days.xcodeproj">
+            ReferencedContainer = "container:Days.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -94,9 +94,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "days.temp_caseinsensitive_rename.app"
+            BuildableName = "Days.app"
             BlueprintName = "days"
-            ReferencedContainer = "container:days.xcodeproj">
+            ReferencedContainer = "container:Days.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -113,9 +113,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "days.temp_caseinsensitive_rename.app"
+            BuildableName = "Days.app"
             BlueprintName = "days"
-            ReferencedContainer = "container:days.xcodeproj">
+            ReferencedContainer = "container:Days.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
