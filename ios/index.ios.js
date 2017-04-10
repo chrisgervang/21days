@@ -10,7 +10,8 @@ import {
   StatusBar,
   ScrollView,
   Text,
-  DatePickerIOS
+  DatePickerIOS,
+  LayoutAnimation
 } from 'react-native';
 
 function parseText(response) {
@@ -20,7 +21,7 @@ function parseText(response) {
 export default class test extends Component {
   scrollView;
   componentDidMount() {
-    console.log("Scroll!", !!this.scrollView.scrollTo)
+    console.log("Scroll!", !!this.scrollView.scrollTo, "test")
     this.scrollView.scrollTo({x: 0, y: 0, animated: false})
   }
 

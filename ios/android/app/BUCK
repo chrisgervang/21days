@@ -44,16 +44,6 @@ android_library(
 )
 
 android_build_config(
-<<<<<<< ours
-  name = 'build_config',
-  package = 'com.21days',
-)
-
-android_resource(
-  name = 'res',
-  res = 'src/main/res',
-  package = 'com.21days',
-=======
     name = "build_config",
     package = "com.days",
 )
@@ -62,7 +52,6 @@ android_resource(
     name = "res",
     package = "com.days",
     res = "src/main/res",
->>>>>>> theirs
 )
 
 android_binary(
