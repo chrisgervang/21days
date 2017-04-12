@@ -34,7 +34,8 @@ app.get('/history', function (request, response) {
 
 WebRoutes.history(app)
 DeviceRoutes.history(app)
-DeviceRoutes.track(app)
+DeviceRoutes.complete(app)
+DeviceRoutes.undo(app)
 
 app.set('port', (process.env.PORT || 5000));
 
