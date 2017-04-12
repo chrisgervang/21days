@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { api_key, device_id } from './token';
 import {Button} from './src/Button'
+import Icon from 'react-native-vector-icons/Entypo';
 
 import {
   AppRegistry,
@@ -11,7 +12,8 @@ import {
   ScrollView,
   Text,
   DatePickerIOS,
-  LayoutAnimation
+  LayoutAnimation,
+  TouchableOpacity
 } from 'react-native';
 
 function parseText(response) {
@@ -19,10 +21,34 @@ function parseText(response) {
 }
 
 export default class test extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      scroll: 0,
+      days: 3
+    }
+  }
   scrollView;
   componentDidMount() {
-    console.log("Scroll!", !!this.scrollView.scrollTo, "test")
-    this.scrollView.scrollTo({x: 0, y: 0, animated: false})
+    var x = Dimensions.get('window').width * (this.state.days - 1)
+    this.scrollView.scrollTo({x: x, y: 0, animated: false})
+    this.setState({scroll: x})
+  }
+
+  handleBack = () => {
+    var x = this.state.scroll - Dimensions.get('window').width;
+    if(x >= 0) {
+      this.scrollView.scrollTo({x: x, y: 0, animated: true})
+      this.setState({scroll: x})
+    }
+  }
+
+  handleForward = () => {
+    var x = this.state.scroll + Dimensions.get('window').width;
+    if(x <= Dimensions.get('window').width * (this.state.days - 1)) {
+      this.scrollView.scrollTo({x: x, y: 0, animated: true})
+      this.setState({scroll: x})
+    }
   }
 
   render() {
@@ -31,12 +57,13 @@ export default class test extends Component {
         <StatusBar
           barStyle='light-content'
         />
-        <ScrollView ref={elt => { console.log("View!", !!elt); this.scrollView = elt;}} indicatorStyle={"white"} contentContainerStyle={{flexDirection: "row"}} snapToAlignment={"center"} horizontal={true} pagingEnabled={true} >
-          <Day key={2} date={"Thursday"}/>
-          <Day key={1} date={"Yesterday"}/>
-          <Day key={0} date={"Today"}/>
-        </ScrollView>
-        
+        <View style={{marginTop: 24, flex: 1}}>
+          <ScrollView ref={elt => this.scrollView = elt} indicatorStyle={"white"} contentContainerStyle={{flexDirection: "row"}} snapToAlignment={"center"} horizontal={true} pagingEnabled={true} >
+            <Day key={2} date={"Thursday"} onBack={this.handleBack} onForward={this.handleForward} canForward={true} canBackward={false}/>
+            <Day key={1} date={"Yesterday"} onBack={this.handleBack} onForward={this.handleForward} canForward={true} canBackward={true}/>
+            <Day key={0} date={"Today"} onBack={this.handleBack} onForward={this.handleForward} canForward={false} canBackward={true}/>
+          </ScrollView>
+        </View>
       </View>
     )
   }
@@ -140,9 +167,10 @@ class Day extends Component {
   }
 
   render() {
+    const { onBack, onForward, canBackward, canForward } = this.props
     return (
       <View style={{paddingLeft: 10, paddingRight: 10}}>
-        <View style={{flex: 1, flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row'}}>
           <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <Button onPress={this.handlePressButtonBrush} img={require('./img/brush.jpg')} pressed={this.state.brush}
                 backgroundColor="#8A7EA8" activeColor="rgb(144, 0, 255)"/>
@@ -160,11 +188,26 @@ class Day extends Component {
                 backgroundColor="#74A574" activeColor="rgb(0, 255, 0)"/>
           </View>
         </View>
-        <View style={{alignItems: "center"}}>
-          <DatePickerIOS date={new Date()} onDateChange={console.log}/>
-          <Text style={{color: "white"}}>
-            {this.props.date}
-          </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{alignItems: "flex-start", justifyContent: "center", width: 24 }}>
+            { canBackward &&
+              <TouchableOpacity onPress={onBack}>
+                <Icon name="chevron-thin-left" size={24} color="#FFF"/>
+              </TouchableOpacity>
+            }
+          </View>
+          <View style={{alignItems: "center", justifyContent: "center", flex: 1}}>
+            <Text style={{color: "white", fontSize: 24, flex: 3}}>
+              {this.props.date}
+            </Text>
+          </View>
+          <View style={{alignItems: "flex-end", justifyContent: "center", width: 24}}>
+            { canForward &&
+              <TouchableOpacity onPress={onForward}>
+                <Icon name="chevron-thin-right" size={24} color="#FFF"/>
+              </TouchableOpacity>
+            }
+          </View>
         </View>
       </View>
     )

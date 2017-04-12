@@ -10,6 +10,7 @@
   "dependencies": {
     "react": "^16.0.0-alpha.6",
     "react-native": "^0.43.2",
+    "react-native-vector-icons": "^4.0.1",
     "redux": "^3.6.0"
   },
   "devDependencies": {
