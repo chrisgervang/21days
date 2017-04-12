@@ -93,8 +93,21 @@ export class Day extends Component {
   }
 
   componentDidMount() {
+
+    function isComplete(json, key) {
+        const arr = json[key]
+        return arr[arr.length - 1] === 1 ? true : false 
+    }
     getHistory().then(json => {
         console.log(json)
+        this.setState({
+            brush: isComplete(json, 'brush twice'),
+            onTime: isComplete(json, 'on time'),
+            sleep: isComplete(json, 'sleep by 12am'),
+            workout: isComplete(json, 'workout'),
+            noSweets: isComplete(json, 'no sweets'),
+            dontMurder: isComplete(json, 'dont murder')
+        })
     }, rejection => console.error(rejection))
   }
 
