@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Day } from './Day'
-import { api_key, device_id } from '../token';
 
 import {
   StyleSheet,

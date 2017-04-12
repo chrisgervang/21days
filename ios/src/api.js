@@ -1,3 +1,5 @@
+import { api_key, device_id } from '../token';
+
 function parseText(response) {
   return response.text()
 }

@@ -95,7 +95,7 @@ export class Day extends Component {
   componentDidMount() {
     getHistory().then(json => {
         console.log(json)
-    })
+    }, rejection => console.error(rejection))
   }
 
   render() {
