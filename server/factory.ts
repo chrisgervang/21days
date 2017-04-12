@@ -1,9 +1,18 @@
 import * as moment from 'moment-timezone';
-import {History} from './commands';
+import { History } from './commands';
 
-export function makeHistory(rows: History[], timezone: string) {
+interface GridHistory {
+    "brush twice": boolean[]
+    "dont murder": boolean[]
+    "no sweets": boolean[]
+    "workout": boolean[]
+    "sleep by 12am": boolean[]
+    "on time": boolean[]
+}
+
+export function makeHistory(rows: History[], timezone: string): GridHistory {
     const TwentyTwoDaysAgo = moment().tz(timezone).subtract(21, 'days');
-    var habitsHistory ={
+    var habitsHistory: GridHistory = {
         "brush twice": [],
         "dont murder": [],
         "no sweets": [],
@@ -37,31 +46,26 @@ export function makeHistory(rows: History[], timezone: string) {
     }
     console.log(JSON.stringify(habitsHistory))
 
+    return habitsHistory    
+}
+
+interface StringHistory {
+    history: string
+    order: string[]
+}
+
+export function gridToString(grid: GridHistory): StringHistory {
     var history = "";
-    Object.keys(habitsHistory).forEach(function(habit, index, keys){
-        const historyOfHabit = habitsHistory[habit].reduce((prev, curr) => {
+    Object.keys(grid).forEach(function(habit, index, keys){
+        const historyOfHabit = grid[habit].reduce((prev, curr) => {
             return prev += String(curr)
         }, "")
         console.log(historyOfHabit)
         history += `${historyOfHabit}${keys.length === index + 1 ? "" : ","}`
     })
-    return {history: history, order: Object.keys(habitsHistory)};
+    return {history: history, order: Object.keys(grid)};
 }
 
 
 
-export function isDoneForDay(history: History[], referenceDate: string, timezone: string, habit: string) {
-    var date = moment(referenceDate).tz(timezone);
-    //, moment().tz('Etc/UTC').format("YYYY-MM-DD")
-    console.log(date.format());
-    
-    var doneForDay = history.some((row) => {
-        if(row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day')) {
-            console.log(row, habit);
-            console.log(moment.tz(row.completed, timezone).format(), moment.tz(row.completed, timezone).isSame(date, 'day'))
-        }
-        return row.habit === habit && moment.tz(row.completed, timezone).isSame(date, 'day');
-    });
 
-    return doneForDay;
-}

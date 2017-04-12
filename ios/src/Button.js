@@ -8,6 +8,7 @@ import {
   Dimensions,
   LayoutAnimation
 } from 'react-native';
+
 export class Button extends Component {
   componentWillMount() {
     LayoutAnimation.spring();

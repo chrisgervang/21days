@@ -1,4 +1,4 @@
-import {Client, QueryResult} from "pg";
+import { Client, QueryResult } from "pg";
 
 export interface History {
     habit: string
