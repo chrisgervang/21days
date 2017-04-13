@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { Button } from './Button'
 import { Bar } from './Bar'
-import { completeHabit, getHistory } from './api'
+import { trackHabit } from './api'
+import { selectors as historySelectors } from '../store/history'
+import { connect } from 'react-redux'
 import {
   StyleSheet,
-  View, 
+  View,
+  LayoutAnimation
 } from 'react-native';
 
 export class Day extends Component {
@@ -22,7 +25,7 @@ export class Day extends Component {
 
   handlePressButtonBrush = () => {
     console.log("BRUSH")
-    completeHabit('brush twice').then(text => {
+    trackHabit('brush twice', this.props.daysAgo, !this.state.brush).then(text => {
         if(text === "Already Done For Today") {        
             LayoutAnimation.spring();
             this.setState({brush: true});
@@ -34,7 +37,7 @@ export class Day extends Component {
 
   handlePressButtonTime = () => {
     console.log("TIME")
-    completeHabit('on time').then(text => {
+    trackHabit('on time', this.props.daysAgo, !this.state.onTime).then(text => {
         if(text === "Already Done For Today") {        
             LayoutAnimation.spring();
             this.setState({onTime: true});
@@ -46,7 +49,7 @@ export class Day extends Component {
 
   handlePressButtonMurder = () => {
     console.log("MURDER")
-    completeHabit('dont murder').then(text => {
+    trackHabit('dont murder', this.props.daysAgo, !this.state.dontMurder).then(text => {
         if(text === "Already Done For Today") {
           LayoutAnimation.spring();
           this.setState({dontMurder: true});
@@ -58,7 +61,7 @@ export class Day extends Component {
 
   handlePressButtonSleep = () => {
     console.log("SLEEP")
-    completeHabit('sleep by 12am').then(text => {
+    trackHabit('sleep by 12am', this.props.daysAgo, !this.state.sleep).then(text => {
         if(text === "Already Done For Today") {
           this.setState({sleep: true});
         }
@@ -69,7 +72,7 @@ export class Day extends Component {
 
   handlePressButtonWorkout = () => {
     console.log("WORKOUT")
-    completeHabit('workout').then(text => {
+    trackHabit('workout', this.props.daysAgo, !this.state.workout).then(text => {
         if(text === "Already Done For Today") {
           LayoutAnimation.spring();
           this.setState({workout: true});
@@ -81,7 +84,7 @@ export class Day extends Component {
 
   handlePressButtonSweets = () => {
     console.log("SWEETS")
-    completeHabit('no sweets').then(text => {
+    trackHabit('no sweets', this.props.daysAgo, !this.state.noSweets).then(text => {
         console.log(text)
         if(text === "Already Done For Today") {
           LayoutAnimation.spring();
@@ -92,23 +95,17 @@ export class Day extends Component {
     this.setState({noSweets: true});
   }
 
-  componentDidMount() {
-
-    function isComplete(json, key) {
-        const arr = json[key]
-        return arr[arr.length - 1] === 1 ? true : false 
-    }
-    getHistory().then(json => {
-        console.log(json)
+  componentDidUpdate(nextProps) {
+      if(this.props.status !== nextProps.status) {
         this.setState({
-            brush: isComplete(json, 'brush twice'),
-            onTime: isComplete(json, 'on time'),
-            sleep: isComplete(json, 'sleep by 12am'),
-            workout: isComplete(json, 'workout'),
-            noSweets: isComplete(json, 'no sweets'),
-            dontMurder: isComplete(json, 'dont murder')
+            brush: this.props.status["brush twice"],
+            onTime: this.props.status["on time"],
+            sleep: this.props.status["sleep by 12am"],
+            workout: this.props.status["workout"],
+            noSweets: this.props.status["no sweets"],
+            dontMurder: this.props.status["dont murder"]
         })
-    }, rejection => console.error(rejection))
+      }
   }
 
   render() {
@@ -138,4 +135,8 @@ export class Day extends Component {
     )
   }
 }
+
+export default connect((state, ownProps) => ({
+    status: historySelectors.fromDaysAgo(state, ownProps.daysAgo)
+}), {})(Day)
 

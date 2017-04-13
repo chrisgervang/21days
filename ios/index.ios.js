@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Track } from './src/Track'
-
+import Track from './src/Track'
+import { createStore } from './store'
+import { Provider } from 'react-redux'
 import {
   AppRegistry,
   StyleSheet,
@@ -8,17 +9,21 @@ import {
   StatusBar,
 } from 'react-native';
 
+const store = createStore()
+
 export default class Main extends Component { 
   render() {
     return (
-      <View style={{flex: 1, backgroundColor: 'black'}}>
-        <StatusBar
-          barStyle='light-content'
-        />
-        <View style={{marginTop: 24, flex: 1}}>
-          <Track/>
+      <Provider store={store}>
+        <View style={{flex: 1, backgroundColor: 'black'}}>
+          <StatusBar
+            barStyle='light-content'
+          />
+          <View style={{marginTop: 24, flex: 1}}>
+            <Track/>
+          </View>
         </View>
-      </View>
+      </Provider>
     )
   }
 }

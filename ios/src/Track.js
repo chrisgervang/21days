@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { Day } from './Day'
+import { connect } from 'react-redux'
+import Day from './Day'
+import { actions as historyActions } from '../store/history'
+import { getHistory } from './api'
 
 import {
   StyleSheet,
@@ -22,6 +25,11 @@ export class Track extends Component {
         var x = Dimensions.get('window').width * (this.state.days - 1)
         this.scrollView.scrollTo({x: x, y: 0, animated: false})
         this.setState({scroll: x})
+
+        getHistory().then(json => {
+            console.log(json)
+            this.props.loadHistory(json)
+        }, rejection => console.error(rejection))
     }
 
     handleBack = () => {
@@ -43,10 +51,16 @@ export class Track extends Component {
     render() {
         return (
             <ScrollView ref={elt => this.scrollView = elt} indicatorStyle={"white"} contentContainerStyle={{flexDirection: "row"}} snapToAlignment={"center"} horizontal={true} pagingEnabled={true} >
-                <Day key={1} date={"Yesterday"} onBack={this.handleBack} onForward={this.handleForward} canForward={true} canBack={false}/>
-                <Day key={0} date={"Today"} onBack={this.handleBack} onForward={this.handleForward} canForward={false} canBack={true}/>
+                <Day key={1} date={"Yesterday"} onBack={this.handleBack} onForward={this.handleForward} canForward={true} canBack={false} daysAgo={1}/>
+                <Day key={0} date={"Today"} onBack={this.handleBack} onForward={this.handleForward} canForward={false} canBack={true} daysAgo={0}/>
             </ScrollView>
         )
         
     }
 }
+
+export default connect(state => ({
+
+}), {
+    loadHistory: historyActions.loadHistory
+})(Track)

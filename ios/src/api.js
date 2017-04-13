@@ -8,15 +8,17 @@ function parseJSON(response) {
   return response.json()
 }
 
-export function completeHabit(habit) {
-  return fetch(`https://server-21days.herokuapp.com/device/track`, 
+export function trackHabit(habit, daysAgo, done) {
+  return fetch(`https://server-21days.herokuapp.com/web/track`, 
     {
       method: 'POST', 
       headers: { "Content-Type": "application/json" }, 
       body: JSON.stringify({
         "api_key": api_key,
         "coreid": device_id,
-        "data": habit
+        "data": habit,
+        "days_ago": daysAgo,
+        "done": done
       })
     }
   ).then((res) => {
