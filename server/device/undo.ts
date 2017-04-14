@@ -42,16 +42,19 @@ export default function init(app: Express) {
                         //     response.send(err);
                         // });
                         done();
+                        response.status(500)
                         response.send("Not Yet Completed Today");
                     }
                     
                 }, (err) => {
-                    done();
+                    done();                        
+                    response.status(500)
                     response.send(err);
                 });
             });
         } else {
             console.error("Auth did not match");
+            response.status(401)
             response.send("Error Auth did not match");
         }
         

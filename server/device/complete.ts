@@ -38,17 +38,20 @@ export default function init(app: Express) {
                             response.send(JSON.stringify(res));
                         }, (err) => {
                             done();
+                            response.status(500)
                             response.send(err);
                         });
                     }
                     
                 }, (err) => {
                     done();
+                    response.status(500)
                     response.send(err);
                 });
             });
         } else {
             console.error("Auth did not match");
+            response.status(401)
             response.send("Error Auth did not match");
         }
         
