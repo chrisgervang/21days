@@ -27,37 +27,37 @@ namespace lights {
     matrix.show();
   }
 
-  void sideOff(Habit &config) {
+  void sideOff(struct Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(0, 0, 0);
     strip.setPixelColor(config.sideLED, rgb);
   }
 
-  void todayOff(Habit &config) {
+  void todayOff(struct Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(0, 0, 0);
     matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
-  void off(Habit &config) {
+  void off(struct Habit &config) {
     sideOff(config);
     todayOff(config);
   }
 
-  void sideOn(Habit &config) {
+  void sideOn(struct Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
     strip.setPixelColor(config.sideLED, rgb);
     strip.setBrightness(127);
   }
 
-  void todayOn(Habit &config) {
+  void todayOn(struct Habit &config) {
     Color color = config.color;
     int rgb = strip.Color(color.r, color.g, color.b);
     matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
-  void historyOn(state::HabitState &state, Habit &config) {
+  void historyOn(state::HabitState &state, struct Habit &config) {
     Color c = config.color;
     // int rgb = strip.Color(color.r, color.g, color.b);
     for (unsigned int day = 0; day < sizeof(state.history); day++) {
@@ -73,7 +73,7 @@ namespace lights {
     }
   }
 
-  void on(Habit &config) {
+  void on(struct Habit &config) {
     sideOn(config);
     todayOn(config);
   }

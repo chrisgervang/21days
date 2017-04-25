@@ -1,7 +1,7 @@
 #include "buttons.h"
 
 namespace buttons {
-  bool isPressed(Habit &config) {
+  bool isPressed(struct Habit &config) {
     return config.button.getSingleDebouncedPress();
   }
 

@@ -1,41 +1,41 @@
 #include "habit.h"
 
-Habit sweets = {
+struct Habit sweets = {
   Pushbutton(D1, false, 0),
   0,
   4,
   {0, 255, 0}
 };
 
-Habit workout = {
+struct Habit workout = {
   Pushbutton(D2, false, 0),
   1,
   2,
   {255, 127, 0}
 };
 
-Habit sleep = {
+struct Habit sleep = {
   Pushbutton(D3, false, 0),
   2,
   5,
   {0, 158, 255}
 };
 
-Habit murder = {
+struct Habit murder = {
   Pushbutton(D4, false, 0),
   3,
   1,
   {255, 0, 25}
 };
 
-Habit onTime = {
+struct Habit onTime = {
   Pushbutton(D5, false, 0),
   4,
   3,
   {255, 255, 0}
 };
 
-Habit brush = {
+struct Habit brush = {
   Pushbutton(D6, false, 0),
   5,
   6,
@@ -44,7 +44,7 @@ Habit brush = {
 
 namespace habit {
   namespace actions {
-    void completeHabit(state::HabitState &state, Habit &config) {
+    void completeHabit(state::HabitState &state, struct Habit &config) {
       Particle.publish("Habit Done!", String(config.matrixRow));
       state.history[21] = true;
       state.doneTime = Time.now();
@@ -67,7 +67,7 @@ namespace habit {
 
     bool up = false;
 
-    void checkDone(state::HabitState &state, Habit &config) {
+    void checkDone(state::HabitState &state, struct Habit &config) {
       if(!state.history[21] && buttons::isPressed(config)) {
         completeHabit(state, config);
         state.previousMillis = millis();

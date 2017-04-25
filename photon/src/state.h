@@ -4,12 +4,12 @@
 #define _STATE
 
 namespace state {
-  typedef struct {
+  typedef struct HabitState {
     long previousMillis;
     int brightness;
     uint8_t history [22];
     int doneTime;
-  } HabitState;
+  };
 
   extern HabitState sweets;
   extern HabitState murder;

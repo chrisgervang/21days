@@ -12,13 +12,13 @@
 namespace lights {
   int map(int row, int column);
   void show();
-  void sideOff(Habit &config);
-  void todayOff(Habit &config);
-  void off(Habit &config);
-  void sideOn(Habit &config);
-  void todayOn(Habit &config);
-  void historyOn(state::HabitState &state, Habit &config);
-  void on(Habit &config);
+  void sideOff(struct Habit &config);
+  void todayOff(struct Habit &config);
+  void off(struct Habit &config);
+  void sideOn(struct Habit &config);
+  void todayOn(struct Habit &config);
+  void historyOn(state::HabitState &state, struct Habit &config);
+  void on(struct Habit &config);
 
   void randomBorder();
   void borderOff();

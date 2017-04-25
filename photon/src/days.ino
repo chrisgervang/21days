@@ -84,7 +84,7 @@ void nightLight() {
  }
 }
 
-void processEndOfDay(state::HabitState &state, Habit &config) {
+void processEndOfDay(state::HabitState &state, struct Habit &config) {
  for(unsigned int day = 0; day < sizeof(state.history) - 1; day++) {
    state.history[day] = state.history[day+1];
  }

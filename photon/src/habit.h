@@ -4,9 +4,9 @@
 #define _HABIT
 
 #include "Pushbutton.h"
+#include "color.h"
 #include "buttons.h"
 #include "sound.h"
-#include "color.h"
 #include "state.h"
 #include "lights.h"
 
@@ -14,26 +14,26 @@ typedef struct Habit {
   Pushbutton button;
   int sideLED;
   int matrixRow;
-  Color color;
-} Habit;
+  struct Color *color;
+};
 
-extern Habit sweets;
+extern struct Habit sweets;
 
-extern Habit workout;
+extern struct Habit workout;
 
-extern Habit sleep;
+extern struct Habit sleep;
 
-extern Habit murder;
+extern struct Habit murder;
 
-extern Habit onTime;
+extern struct Habit onTime;
 
-extern Habit brush;
+extern struct Habit brush;
 
 namespace habit {
   namespace actions {
-    void completeHabit(state::HabitState &state, Habit &config);
+    void completeHabit(state::HabitState &state, struct Habit &config);
     extern bool up;
-    void checkDone(state::HabitState &state, Habit &config);
+    void checkDone(state::HabitState &state, struct Habit &config);
   }
 }
 
