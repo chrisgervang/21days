@@ -9,15 +9,17 @@
 
 #include "strip.h"
 #include "matrix.h"
+#include "color.h"
+#include "sound.h"
 
 #include "helpers.h"
 
 #include "buttons.h"
-#include "color.h"
+
 #include "habit.h"
 #include "lights.h"
 #include "state.h"
-#include "sound.h"
+
 
 #include "history.h"
 

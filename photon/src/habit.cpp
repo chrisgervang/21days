@@ -1,12 +1,5 @@
 #include "habit.h"
 
-typedef struct {
-  Pushbutton button;
-  int sideLED;
-  int matrixRow;
-  Color color;
-} Habit;
-
 Habit sweets = {
   Pushbutton(D1, false, 0),
   0,

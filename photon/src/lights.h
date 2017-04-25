@@ -3,9 +3,11 @@
 #ifndef _LIGHTS
 #define _LIGHTS
 
+#include "habit.h"
 #include "color.h"
 #include "strip.h"
 #include "matrix.h"
+#include "state.h"
 
 namespace lights {
   int map(int row, int column);
