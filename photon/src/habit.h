@@ -4,14 +4,13 @@
 #define _HABIT
 
 #include "Pushbutton.h"
-#inlcude "buttons.h"
+#include "buttons.h"
 #include "sound.h"
 #include "color.h"
 #include "state.h"
 #include "lights.h"
 
-
-typedef struct {
+typedef struct Habit {
   Pushbutton button;
   int sideLED;
   int matrixRow;

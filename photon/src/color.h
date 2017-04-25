@@ -3,10 +3,12 @@
 #ifndef _COLOR
 #define _COLOR
 
-typedef struct {
+struct Color {
   uint16_t r;
   uint16_t g;
   uint16_t b;
-} Color;
+};
+
+typedef struct Color Color;
 
 #endif
