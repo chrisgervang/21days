@@ -4,8 +4,9 @@
 #define _DEMO
 
 #include "state.h"
+#include "habit.h"
 #include "lights.h"
 
-void randomHistory()
+void randomHistory();
 
 #endif

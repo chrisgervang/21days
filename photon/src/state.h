@@ -4,10 +4,10 @@
 #define _STATE
 
 namespace state {
-  typedef struct HabitState {
+  struct HabitState {
     long previousMillis;
     int brightness;
-    uint8_t history [22];
+    int history [22];
     int doneTime;
   };
 
@@ -29,6 +29,6 @@ namespace state {
   extern bool intro;
   extern long lastIntro;
   extern int introColumn;
-}
+};
 
 #endif

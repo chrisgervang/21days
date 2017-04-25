@@ -27,45 +27,45 @@ namespace lights {
     matrix.show();
   }
 
-  void sideOff(struct Habit &config) {
-    Color color = config.color;
+  void sideOff(Habit &config) {
+    Color *color = config.color;
     int rgb = strip.Color(0, 0, 0);
     strip.setPixelColor(config.sideLED, rgb);
   }
 
-  void todayOff(struct Habit &config) {
-    Color color = config.color;
+  void todayOff(Habit &config) {
+    Color *color = config.color;
     int rgb = strip.Color(0, 0, 0);
     matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
-  void off(struct Habit &config) {
+  void off(Habit &config) {
     sideOff(config);
     todayOff(config);
   }
 
-  void sideOn(struct Habit &config) {
-    Color color = config.color;
-    int rgb = strip.Color(color.r, color.g, color.b);
+  void sideOn(Habit &config) {
+    Color *color = config.color;
+    int rgb = strip.Color(color->r, color->g, color->b);
     strip.setPixelColor(config.sideLED, rgb);
     strip.setBrightness(127);
   }
 
-  void todayOn(struct Habit &config) {
-    Color color = config.color;
-    int rgb = strip.Color(color.r, color.g, color.b);
+  void todayOn(Habit &config) {
+    Color *color = config.color;
+    int rgb = strip.Color(color->r, color->g, color->b);
     matrix.setPixelColor(map(config.matrixRow, 22), rgb);
   }
 
-  void historyOn(state::HabitState &state, struct Habit &config) {
-    Color c = config.color;
+  void historyOn(state::HabitState &state, Habit &config) {
+    Color *c = config.color;
     // int rgb = strip.Color(color.r, color.g, color.b);
     for (unsigned int day = 0; day < sizeof(state.history); day++) {
       if(state.history[day] == 1) {
         if(day == sizeof(state.history) - 1) {
-          matrix.setColorDimmed(map(config.matrixRow, day + 1), c.r, c.g, c.b, state.brightness);
+          matrix.setColorDimmed(map(config.matrixRow, day + 1), c->r, c->g, c->b, state.brightness);
         } else {
-          matrix.setColorDimmed(map(config.matrixRow, day + 1), c.r, c.g, c.b, 180);
+          matrix.setColorDimmed(map(config.matrixRow, day + 1), c->r, c->g, c->b, 180);
         }
       } else {
         matrix.setPixelColor(map(config.matrixRow, day + 1), 0, 0, 0);
@@ -73,7 +73,7 @@ namespace lights {
     }
   }
 
-  void on(struct Habit &config) {
+  void on(Habit &config) {
     sideOn(config);
     todayOn(config);
   }

@@ -6,8 +6,8 @@
 #include "habit.h"
 
 namespace buttons {
-  bool isPressed(struct Habit &config);
+  bool isPressed(Habit &config);
   bool isAnyPressed();
-}
+};
 
 #endif

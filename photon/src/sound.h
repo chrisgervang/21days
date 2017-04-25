@@ -3,6 +3,8 @@
 #ifndef _SOUND
 #define _SOUND
 
-void playRandomSound()
+#include "application.h"
+
+void playRandomSound();
 
 #endif

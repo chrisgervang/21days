@@ -5,24 +5,23 @@
  * Date:
  */
 
+// Depenency Order
 #include "EasingLibrary.h"
-
 #include "strip.h"
 #include "matrix.h"
 #include "color.h"
 #include "sound.h"
-
-#include "helpers.h"
-
-#include "buttons.h"
-
 #include "habit.h"
 #include "lights.h"
 #include "state.h"
 
 
-#include "history.h"
+#include "helpers.h"
+#include "buttons.h"
 
+#include "history.h"
+#include "borders.h"
+#include "actions.h"
 #include "demo.h"
 
 int LEDinterval = 10;
@@ -35,14 +34,14 @@ int LEDinterval = 10;
 int remoteCompleteHabit(String habit);
 void handleHistory(const char *event, const char *data);
 
-typedef struct {
+struct AnimationConfig{
   int duration;
   bool looping;
-} AnimationConfig;
+};
 
-typedef struct {
+struct AnimationState {
   int lastFrame;
-} AnimationState;
+};
 
 void nightLight() {
  //TODO: this isnt working as expected. throw a publish in here.
@@ -84,7 +83,7 @@ void nightLight() {
  }
 }
 
-void processEndOfDay(state::HabitState &state, struct Habit &config) {
+void processEndOfDay(state::HabitState &state, Habit &config) {
  for(unsigned int day = 0; day < sizeof(state.history) - 1; day++) {
    state.history[day] = state.history[day+1];
  }
@@ -148,22 +147,22 @@ void morning() {
 
 int remoteCompleteHabit(String habit) {
  if(habit == "no sweets") {
-   completeHabit(state::sweets, sweets);
+   actions::completeHabit(state::sweets, sweets);
    return 1;
  } else if (habit == "dont murder") {
-   completeHabit(state::murder, murder);
+   actions::completeHabit(state::murder, murder);
    return 1;
  } else if ( habit == "brush twice") {
-   completeHabit(state::brush, brush);
+   actions::completeHabit(state::brush, brush);
    return 1;
  } else if (habit == "sleep by 12am") {
-   completeHabit(state::sleep, sleep);
+   actions::completeHabit(state::sleep, sleep);
    return 1;
  } else if (habit == "on time") {
-   completeHabit(state::onTime, onTime);
+   actions::completeHabit(state::onTime, onTime);
    return 1;
  } else if( habit == "workout") {
-   completeHabit(state::workout, workout);
+   actions::completeHabit(state::workout, workout);
    return 1;
  } else {
    return -1;
@@ -235,12 +234,12 @@ void setup() {
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  checkDone(state::sweets, sweets);
-  checkDone(state::murder, murder);
-  checkDone(state::brush, brush);
-  checkDone(state::onTime, onTime);
-  checkDone(state::sleep, sleep);
-  checkDone(state::workout, workout);
+  actions::checkDone(state::sweets, sweets);
+  actions::checkDone(state::murder, murder);
+  actions::checkDone(state::brush, brush);
+  actions::checkDone(state::onTime, onTime);
+  actions::checkDone(state::sleep, sleep);
+  actions::checkDone(state::workout, workout);
   endOfDay();
   nightLight();
   morning();

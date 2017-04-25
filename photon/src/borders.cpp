@@ -1,3 +1,5 @@
+#include "borders.h"
+
 void weekendBorder() {
   long currentDay = state::dayStamp;
   //int rgb = strip.Color(255, 255, 255);

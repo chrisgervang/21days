@@ -5,36 +5,26 @@
 
 #include "Pushbutton.h"
 #include "color.h"
-#include "buttons.h"
 #include "sound.h"
 #include "state.h"
-#include "lights.h"
 
-typedef struct Habit {
+struct Habit {
   Pushbutton button;
   int sideLED;
   int matrixRow;
-  struct Color *color;
+  Color *color;
 };
 
-extern struct Habit sweets;
+extern Habit sweets;
 
-extern struct Habit workout;
+extern Habit workout;
 
-extern struct Habit sleep;
+extern Habit sleep;
 
-extern struct Habit murder;
+extern Habit murder;
 
-extern struct Habit onTime;
+extern Habit onTime;
 
-extern struct Habit brush;
-
-namespace habit {
-  namespace actions {
-    void completeHabit(state::HabitState &state, struct Habit &config);
-    extern bool up;
-    void checkDone(state::HabitState &state, struct Habit &config);
-  }
-}
+extern Habit brush;
 
 #endif

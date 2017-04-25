@@ -1,11 +1,11 @@
 #include "buttons.h"
 
 namespace buttons {
-  bool isPressed(struct Habit &config) {
+  bool isPressed(Habit &config) {
     return config.button.getSingleDebouncedPress();
   }
 
   bool isAnyPressed() {
-    return buttons::isPressed(sweets) || buttons::isPressed(murder) || buttons::isPressed(brush) || buttons::isPressed(onTime) || buttons::isPressed(sleep) || buttons::isPressed(workout) ;
+    return buttons::isPressed(sweets) || buttons::isPressed(murder) || buttons::isPressed(brush) || buttons::isPressed(onTime) || buttons::isPressed(sleep) || buttons::isPressed(workout);
   }
 };

@@ -5,6 +5,6 @@
 
 #include "state.h"
 
-bool isAnyDone()
+bool isAnyDone();
 
 #endif

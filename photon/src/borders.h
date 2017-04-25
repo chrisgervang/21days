@@ -3,9 +3,10 @@
 #ifndef _BORDERS
 #define _BORDERS
 
-#include "state.h"
 #include "matrix.h"
+#include "state.h"
+#include "lights.h"
 
-void weekendBorder()
+void weekendBorder();
 
 #endif
