@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _HELPERS
 #define _HELPERS
 

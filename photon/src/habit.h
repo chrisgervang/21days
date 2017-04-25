@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _HABIT
 #define _HABIT
 

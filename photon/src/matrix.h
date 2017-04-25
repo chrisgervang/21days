@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _MATRIX
 #define _MATRIX
 

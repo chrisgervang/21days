@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _LIGHTS
 #define _LIGHTS
 

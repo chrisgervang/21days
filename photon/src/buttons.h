@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _BUTTONS
 #define _BUTTONS
 

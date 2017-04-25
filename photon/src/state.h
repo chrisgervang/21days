@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _STATE
 #define _STATE
 

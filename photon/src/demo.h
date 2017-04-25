@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _DEMO
 #define _DEMO
 
