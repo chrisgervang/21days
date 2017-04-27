@@ -5,6 +5,8 @@
 
 #include "application.h"
 
+#define AUDIO_PIN D6
+
 void playRandomSound();
 
 #endif

@@ -24,6 +24,8 @@
 #include "actions.h"
 #include "demo.h"
 
+STARTUP(WiFi.selectAntenna(ANT_EXTERNAL));
+
 int LEDinterval = 10;
 
 /*Color brightness(Color &color, int b) {
@@ -32,7 +34,6 @@ int LEDinterval = 10;
 }*/
 
 int remoteCompleteHabit(String habit);
-void handleHistory(const char *event, const char *data);
 
 struct AnimationConfig{
   int duration;
@@ -84,7 +85,7 @@ void nightLight() {
 }
 
 void processEndOfDay(state::HabitState &state, Habit &config) {
- for(unsigned int day = 0; day < sizeof(state.history) - 1; day++) {
+ for(unsigned int day = 0; day < DAYS - 1; day++) {
    state.history[day] = state.history[day+1];
  }
 
@@ -112,7 +113,7 @@ void endOfDay() {
    processEndOfDay(state::onTime, onTime);
    processEndOfDay(state::workout, workout);
    processEndOfDay(state::sleep, sleep);
-   weekendBorder();
+   borders::weekend();
    lights::show();
    state::dayStamp = Time.now();
 
@@ -125,25 +126,6 @@ void morning() {
    state::lightsOut = false;
  }
 }
-
-// void gradientHistory() {
-//   for (unsigned int day = 0; day < sizeof(state::sweets.history); day++) {
-//     Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(sweets.matrixRow, day + 1), c1.r, c1.g, c1.b);
-//     Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(murder.matrixRow, day + 1), c2.r, c2.g, c2.b);
-//     Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(brush.matrixRow, day + 1), c3.r, c3.g, c3.b);
-//     Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(sleep.matrixRow, day + 1), c4.r, c4.g, c4.b);
-//     Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(workout.matrixRow, day + 1), c5.r, c5.g, c5.b);
-//     Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
-//     matrix.setPixelColor(lights::map(onTime.matrixRow, day + 1), c6.r, c6.g, c6.b);
-//   }
-// }
-
-
 
 int remoteCompleteHabit(String habit) {
  if(habit == "no sweets") {
@@ -170,16 +152,15 @@ int remoteCompleteHabit(String habit) {
 }
 
 void handleLightsOut(int light) {
- state::lightsOut = true;
- state::lastLightsOut = millis();
- Particle.publish("lights out!", String(light));
- lights::borderOff();
- lights::off(sweets);
- lights::off(murder);
- lights::off(brush);
- lights::show();
+  state::lightsOut = true;
+  state::lastLightsOut = millis();
+  Particle.publish("lights out!", String(light));
+  borders::off();
+  lights::off(sweets);
+  lights::off(murder);
+  lights::off(brush);
+  lights::show();
 }
-
 
 void turnOn(uint8_t pixel, uint8_t duration, uint32_t color) {
    CubicEase back;
@@ -201,8 +182,8 @@ void turnOn(uint8_t pixel, uint8_t duration, uint32_t color) {
 void setup() {
   /*Serial.begin(9600);
   while(!Serial.isConnected()) Particle.process();*/
-  pinMode(D6, OUTPUT);
-  digitalWrite(D6, HIGH);
+  //pinMode(AUDIO_PIN, OUTPUT);
+  //digitalWrite(AUDIO_PIN, HIGH);
 
   pinMode(A0, INPUT);
 
@@ -216,7 +197,7 @@ void setup() {
   Time.zone(-8);
 
   state::dayStamp = Time.now();
-  weekendBorder();
+  //borders::sparkle();
   //gradientHistory();
   delay(100);
   matrix.show(); // Initialize all pixels to 'off'
@@ -271,7 +252,8 @@ void loop() {
         lights::historyOn(state::workout, workout);
         lights::historyOn(state::sleep, sleep);
         lights::historyOn(state::onTime, onTime);
-
+        //allOn();
+        delay(100);
       } else {
         state::introColumn += 1;
       }
@@ -281,25 +263,39 @@ void loop() {
 
   }
 
-  // if(millis() - state::lastBorder > 2000) {
-  //   if(!state::lightsOut) {
-  //     lights::randomBorder();
-  //   }
-  //   //Particle.publish("state", "sweets: " + String(state::sweets.done) + " " + String(sweets.sideLED) + " " + String(state::sweets.doneTime) + " murder: " + state::murder.done + " " + String(murder.sideLED) + " brush: " + String(state::brush.done) );
-  //   state::lastBorder = millis();
-  // }
+  if(millis() - state::lastBorder > 2000) {
+    /*if(!state::lightsOut) {
+      borders::sparkle();
+      lights::show();
+    }*/
 
-    /*turnOn(0, 4, strip.Color(144, 0, 255));
-    turnOn(1, 4, strip.Color(0, 158, 255));
-    turnOn(2, 4, strip.Color(0, 255, 0));
-    turnOn(3, 4, strip.Color(255, 225, 0));
-    turnOn(0, 4, strip.Color(255, 158, 0));
-    turnOn(1, 4, strip.Color(255, 0, 37));*/
+    /*lights::matrixOn(state::row, state::col, strip.Color(0, 255, 0));
+    lights::show();
+    if(state::col < 23) {
+      state::col += 1;
+    } else if(state::row < 7) {
+      state::col = 0;
+      state::row += 1;
+    } else {
+      state::col = 0;
+      state::row = 0;
+    }*/
+
+    //Particle.publish("state", "sweets: " + String(state::sweets.done) + " " + String(sweets.sideLED) + " " + String(state::sweets.doneTime) + " murder: " + state::murder.done + " " + String(murder.sideLED) + " brush: " + String(state::brush.done) );
+    state::lastBorder = millis();
+  }
+
+  /*lights::turnOn(0, 4, strip.Color(144, 0, 255));
+  lights::turnOn(1, 4, strip.Color(0, 158, 255));
+  lights::turnOn(2, 4, strip.Color(0, 255, 0));
+  lights::turnOn(3, 4, strip.Color(255, 225, 0));
+  lights::turnOn(0, 4, strip.Color(255, 158, 0));
+  lights::turnOn(1, 4, strip.Color(255, 0, 37));*/
 
   if(millis() - state::lastShow > 1000) {
     int light = analogRead(A0);
-
-    if(light < 200 && !state::lightsOut && isAnyDone()) {
+    //Particle.publish("light", String(light));
+    if(light < 100 && !state::lightsOut && isAnyDone()) {
       handleLightsOut(light);
     }
 

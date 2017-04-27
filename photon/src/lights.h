@@ -16,12 +16,10 @@ namespace lights {
   void todayOff(Habit &config);
   void off(Habit &config);
   void sideOn(Habit &config);
+  void matrixOn(int row, int col, uint32_t color);
   void todayOn(Habit &config);
   void historyOn(state::HabitState &state, Habit &config);
   void on(Habit &config);
-
-  void randomBorder();
-  void borderOff();
 }
 
 #endif

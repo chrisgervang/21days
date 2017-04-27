@@ -41,6 +41,23 @@ void handleHistory(const char *event, const char *data) {
   lights::historyOn(state::workout, workout);
   lights::historyOn(state::sleep, sleep);
   lights::historyOn(state::onTime, onTime);
-
+  delay(100);
   lights::show();
+}
+
+void allOn() {
+  for (unsigned int day = 0; day < DAYS; day++) {
+    //Color c1 = hsv2rgb({120, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(sweets.matrixRow, day + 1), sweets.color->r, sweets.color->g, sweets.color->b);
+    //Color c2 = hsv2rgb({350, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(murder.matrixRow, day + 1), murder.color->r, murder.color->g, murder.color->b);
+    //Color c3 = hsv2rgb({273, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(brush.matrixRow, day + 1), brush.color->r, brush.color->g, brush.color->b);
+    //Color c4 = hsv2rgb({201, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(sleep.matrixRow, day + 1), sleep.color->r, sleep.color->g, sleep.color->b);
+    //Color c5 = hsv2rgb({36, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(workout.matrixRow, day + 1), workout.color->r, workout.color->g, workout.color->b);
+    //Color c6 = hsv2rgb({52, 100, map(day, 0, 20, 0, 100)});
+    matrix.setPixelColor(lights::map(onTime.matrixRow, day + 1), onTime.color->r, onTime.color->g, onTime.color->b);
+  }
 }

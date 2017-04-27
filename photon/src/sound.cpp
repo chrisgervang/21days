@@ -1,7 +1,9 @@
 #include "sound.h"
 
 void playRandomSound() {
-  digitalWrite(D6, LOW);
+  digitalWrite(AUDIO_PIN, LOW);
   delay(200);
-  digitalWrite(D6, HIGH);
+  digitalWrite(AUDIO_PIN, HIGH);
 }
+
+// iphone text sound

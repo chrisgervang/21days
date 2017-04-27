@@ -51,6 +51,12 @@ namespace lights {
     strip.setBrightness(127);
   }
 
+  void matrixOn(int row, int col, uint32_t color) {
+    if(row >= 0 && row <= 7 && col >= 0 && col <=23) {
+      matrix.setPixelColor(map(row, col), color);
+    }
+  }
+
   void todayOn(Habit &config) {
     Color *color = config.color;
     int rgb = strip.Color(color->r, color->g, color->b);
@@ -60,9 +66,9 @@ namespace lights {
   void historyOn(state::HabitState &state, Habit &config) {
     Color *c = config.color;
     // int rgb = strip.Color(color.r, color.g, color.b);
-    for (unsigned int day = 0; day < sizeof(state.history); day++) {
+    for (unsigned int day = 0; day < DAYS; day++) {
       if(state.history[day] == 1) {
-        if(day == sizeof(state.history) - 1) {
+        if(day == DAYS - 1) {
           matrix.setColorDimmed(map(config.matrixRow, day + 1), c->r, c->g, c->b, state.brightness);
         } else {
           matrix.setColorDimmed(map(config.matrixRow, day + 1), c->r, c->g, c->b, 180);
@@ -78,33 +84,4 @@ namespace lights {
     todayOn(config);
   }
 
-  void randomBorder() {
-    for(int col = 0; col < 24; col++) {
-      matrix.setPixelColor(map(0, col), random(256), random(256), random(256)); // Top Left board 3
-    }
-    for (int col = 0; col < 24; col++) {
-      matrix.setPixelColor(map(7, col), random(256), random(256), random(256)); // Top Left board 3
-    }
-    for (int row = 1; row < 7; row++) {
-      matrix.setPixelColor(map(row, 0), random(256), random(256), random(256)); // Top Left board 3
-    }
-    for (int row = 1; row < 7; row++) {
-      matrix.setPixelColor(map(row, 23), random(256), random(256), random(256)); // Top Left board 3
-    }
-  }
-
-  void borderOff() {
-    for(int col = 0; col < 24; col++) {
-      matrix.setPixelColor(map(0, col), 0,0,0); // Top Left board 3
-    }
-    for (int col = 0; col < 24; col++) {
-      matrix.setPixelColor(map(7, col), 0,0,0); // Top Left board 3
-    }
-    for (int row = 1; row < 7; row++) {
-      matrix.setPixelColor(map(row, 0), 0,0,0); // Top Left board 3
-    }
-    for (int row = 1; row < 7; row++) {
-      matrix.setPixelColor(map(row, 23), 0,0,0); // Top Left board 3
-    }
-  }
 };

@@ -7,6 +7,10 @@
 #include "state.h"
 #include "lights.h"
 
-void weekendBorder();
+namespace borders {
+  void weekend();
+  void sparkle();
+  void off();
+}
 
 #endif

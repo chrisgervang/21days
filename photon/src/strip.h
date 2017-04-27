@@ -5,7 +5,7 @@
 
 #include "Adafruit_Pixie.h"
 
-#define NUMPIXELS 3 // Number of Pixies in the strip
+#define NUMPIXELS 6 // Number of Pixies in the strip
 
 extern Adafruit_Pixie strip;
 

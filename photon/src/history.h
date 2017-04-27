@@ -9,4 +9,6 @@
 
 void handleHistory(const char *event, const char *data);
 
+void allOn();
+
 #endif
